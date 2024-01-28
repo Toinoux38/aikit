@@ -6,3 +6,4 @@ RUN CGO_ENABLED=0 go build -o /aikit --ldflags '-extldflags "-static"' ./cmd/fro
 FROM scratch
 COPY --from=builder /aikit /bin/aikit
 ENTRYPOINT ["/bin/aikit"]
+

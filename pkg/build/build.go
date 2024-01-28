@@ -14,6 +14,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sozercan/aikit/pkg/aikit/config"
 	"github.com/sozercan/aikit/pkg/aikit2llb"
+	"github.com/sozercan/aikit/pkg/aikit2llb/finetune"
 	"github.com/sozercan/aikit/pkg/utils"
 )
 
@@ -24,12 +25,57 @@ const (
 )
 
 func Build(ctx context.Context, c client.Client) (*client.Result, error) {
-	cfg, err := getAikitfileConfig(ctx, c)
+	inferenceCfg, finetuneCfg, err := getAikitfileConfig(ctx, c)
 	if err != nil {
 		return nil, errors.Wrap(err, "getting aikitfile")
 	}
 
-	err = validateConfig(cfg)
+	if finetuneCfg != nil {
+		return buildFineTune(ctx, c, finetuneCfg)
+	} else if inferenceCfg != nil {
+		return buildInference(ctx, c, inferenceCfg)
+	}
+
+	return nil, nil
+}
+
+func buildFineTune(ctx context.Context, c client.Client, cfg *config.FineTuneConfig) (*client.Result, error) {
+	err := validateFinetuneConfig(cfg)
+	if err != nil {
+		return nil, errors.Wrap(err, "validating aikitfile")
+	}
+
+	st, img := finetune.Aikit2LLB(cfg)
+
+	def, err := st.Marshal(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to marshal local source")
+	}
+	res, err := c.Solve(ctx, client.SolveRequest{
+		Definition: def.ToPB(),
+	})
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to resolve dockerfile")
+	}
+	ref, err := res.SingleRef()
+	if err != nil {
+		return nil, err
+	}
+
+	config, err := json.Marshal(img)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to marshal image config")
+	}
+	k := platforms.Format(platforms.DefaultSpec())
+
+	res.AddMeta(fmt.Sprintf("%s/%s", exptypes.ExporterImageConfigKey, k), config)
+	res.SetRef(ref)
+
+	return res, nil
+}
+
+func buildInference(ctx context.Context, c client.Client, cfg *config.Config) (*client.Result, error) {
+	err := validateConfig(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "validating aikitfile")
 	}
@@ -63,7 +109,7 @@ func Build(ctx context.Context, c client.Client) (*client.Result, error) {
 	return res, nil
 }
 
-func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Config, error) {
+func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Config, *config.FineTuneConfig, error) {
 	opts := c.BuildOpts().Opts
 	filename := opts[keyFilename]
 	if filename == "" {
@@ -84,7 +130,7 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Config, e
 
 	def, err := src.Marshal(ctx)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to marshal local source")
+		return nil, nil, errors.Wrapf(err, "failed to marshal local source")
 	}
 
 	var dtDockerfile []byte
@@ -92,27 +138,34 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Config, e
 		Definition: def.ToPB(),
 	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to resolve dockerfile")
+		return nil, nil, errors.Wrapf(err, "failed to resolve dockerfile")
 	}
 
 	ref, err := res.SingleRef()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	dtDockerfile, err = ref.ReadFile(ctx, client.ReadRequest{
 		Filename: filename,
 	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to read dockerfile")
+		return nil, nil, errors.Wrapf(err, "failed to read dockerfile")
 	}
 
-	cfg, err := config.NewFromBytes(dtDockerfile)
+	inferenceCfg, finetuneCfg, err := config.NewFromBytes(dtDockerfile)
 	if err != nil {
-		return nil, errors.Wrap(err, "getting config")
+		return nil, nil, errors.Wrap(err, "getting config")
 	}
 
-	return cfg, nil
+	return inferenceCfg, finetuneCfg, nil
+}
+
+func validateFinetuneConfig(c *config.FineTuneConfig) error {
+	if c.APIVersion == "" {
+		return errors.New("apiVersion is not defined")
+	}
+	return nil
 }
 
 func validateConfig(c *config.Config) error {

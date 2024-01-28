@@ -1,0 +1,32 @@
+#syntax=aikit:test
+apiVersion: v1alpha1
+debug: true
+runtime: cuda
+provider: axolotl
+baseModel: NousResearch/Llama-2-7b-hf
+datasets:
+  - source: "https://huggingface.co/datasets/laion/OIG/resolve/main/unified_chip2.jsonl"
+    type: alpaca
+config:
+  common:
+    packing: true # sample_packing in axolotl?
+    loadIn4bit: true # maybe?
+    batchSize: 2
+    gradientAccumulationSteps: 4
+    warmupSteps: 5
+    maxSteps: 60
+    learningRate: 1e-4
+    fp16: true
+    bf16: false
+    tf32: false
+    loggingSteps: 1
+    optimizer: adamw_8bit
+    weightDecay: 0.01
+    lrSchedular: linear
+    seed: 42
+  axolotl:
+    flashAttention: true
+output:
+  path: path/to/model
+  format: f16
+  quantize: q4_0

@@ -12,4 +12,6 @@ const (
 	BackendMamba           = "mamba"
 
 	APIv1alpha1 = "v1alpha1"
+
+	DebianSlim     = "docker.io/library/debian:12-slim"
 )

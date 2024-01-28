@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	debianSlim     = "docker.io/library/debian:12-slim"
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
 	localAIVersion = "v2.6.1"
@@ -24,7 +23,7 @@ const (
 
 func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 	var merge llb.State
-	state := llb.Image(debianSlim)
+	state := llb.Image(utils.DebianSlim)
 	base := getBaseImage(c)
 
 	state, merge = copyModels(c, base, state)
@@ -54,7 +53,7 @@ func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 
 func getBaseImage(c *config.Config) llb.State {
 	if len(c.Backends) > 0 {
-		return llb.Image(debianSlim)
+		return llb.Image(utils.DebianSlim)
 	}
 	return llb.Image(distrolessBase)
 }
