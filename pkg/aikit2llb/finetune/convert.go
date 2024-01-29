@@ -12,7 +12,8 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 
 	state := llb.Image(utils.DebianSlim)
 	state = state.Run(sh("apt-get update && apt-get install -y python3 python3-pip git"), llb.IgnoreCache).Root()
-	state = state.Run(sh("pip install 'unsloth[cu121_ampere] @ git+https://github.com/unslothai/unsloth.git'")).Root()
+	state = state.Run(sh("pip install packaging")).Root()
+	state = state.Run(sh("pip install 'unsloth[cu121_ampere] @ git+https://github.com/unslothai/unsloth.git' --break-system-packages")).Root()
 
 	cudaKeyringURL := "https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb"
 	cudaKeyring := llb.HTTP(cudaKeyringURL)
