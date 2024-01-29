@@ -2,7 +2,6 @@ package aikit2llb
 
 import (
 	"fmt"
-	"net/url"
 	"path"
 	"strings"
 
@@ -62,7 +61,7 @@ func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.S
 	savedState := s
 	for _, model := range c.Models {
 		var opts []llb.HTTPOption
-		opts = append(opts, llb.Filename(fileNameFromURL(model.Source)))
+		opts = append(opts, llb.Filename(utils.FileNameFromURL(model.Source)))
 		if model.SHA256 != "" {
 			digest := digest.NewDigestFromEncoded(digest.SHA256, model.SHA256)
 			opts = append(opts, llb.Checksum(digest))
@@ -72,9 +71,9 @@ func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.S
 
 		var modelPath string
 		if strings.Contains(model.Name, "/") {
-			modelPath = "/models/" + path.Dir(model.Name) + "/" + fileNameFromURL(model.Source)
+			modelPath = "/models/" + path.Dir(model.Name) + "/" + utils.FileNameFromURL(model.Source)
 		} else {
-			modelPath = "/models/" + fileNameFromURL(model.Source)
+			modelPath = "/models/" + utils.FileNameFromURL(model.Source)
 		}
 
 		var copyOpts []llb.CopyOption
@@ -82,8 +81,8 @@ func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.S
 			CreateDestPath: true,
 		})
 		s = s.File(
-			llb.Copy(m, fileNameFromURL(model.Source), modelPath, copyOpts...),
-			llb.WithCustomName("Copying "+fileNameFromURL(model.Source)+" to "+modelPath), //nolint: goconst
+			llb.Copy(m, utils.FileNameFromURL(model.Source), modelPath, copyOpts...),
+			llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+modelPath), //nolint: goconst
 		)
 
 		// create prompt templates if defined
@@ -104,20 +103,12 @@ func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.S
 	return s, merge
 }
 
-func fileNameFromURL(urlString string) string {
-	parsedURL, err := url.Parse(urlString)
-	if err != nil {
-		panic(err)
-	}
-	return path.Base(parsedURL.Path)
-}
-
 func installCuda(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.State) {
 	cudaKeyringURL := "https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb"
 	cudaKeyring := llb.HTTP(cudaKeyringURL)
 	s = s.File(
-		llb.Copy(cudaKeyring, fileNameFromURL(cudaKeyringURL), "/"),
-		llb.WithCustomName("Copying "+fileNameFromURL(cudaKeyringURL)), //nolint: goconst
+		llb.Copy(cudaKeyring, utils.FileNameFromURL(cudaKeyringURL), "/"),
+		llb.WithCustomName("Copying "+utils.FileNameFromURL(cudaKeyringURL)), //nolint: goconst
 	)
 	s = s.Run(sh("dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
 
@@ -240,7 +231,7 @@ func addLocalAI(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.
 	localAI := llb.HTTP(localAIURL, opts...)
 	s = s.File(
 		llb.Copy(localAI, "local-ai", "/usr/bin/local-ai"),
-		llb.WithCustomName("Copying "+fileNameFromURL(localAIURL)+" to /usr/bin"), //nolint: goconst
+		llb.WithCustomName("Copying "+utils.FileNameFromURL(localAIURL)+" to /usr/bin"), //nolint: goconst
 	)
 
 	diff := llb.Diff(savedState, s)
