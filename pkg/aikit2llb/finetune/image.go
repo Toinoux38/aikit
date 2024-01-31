@@ -9,7 +9,7 @@ import (
 func NewImageConfig(c *config.FineTuneConfig) *specs.Image {
 	img := emptyImage(c)
 
-	img.Config.Entrypoint = []string{"python3"}
+	img.Config.Entrypoint = []string{"python script.py"}
 	return img
 }
 

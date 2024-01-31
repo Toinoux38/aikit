@@ -1,14 +1,14 @@
 #syntax=aikit:test
 apiVersion: v1alpha1
 debug: true
-runtime: cuda
-provider: axolotl
+runtime: cuda # remove
+provider: unsloth
 baseModel: NousResearch/Llama-2-7b-hf
 datasets:
   - source: "https://huggingface.co/datasets/laion/OIG/resolve/main/unified_chip2.jsonl"
     type: alpaca
 config:
-  common:
+  unsloth:
     packing: true # sample_packing in axolotl?
     loadIn4bit: true # maybe?
     batchSize: 2
@@ -24,9 +24,8 @@ config:
     weightDecay: 0.01
     lrSchedular: linear
     seed: 42
-  axolotl:
-    flashAttention: true
 output:
   path: path/to/model
   format: f16
   quantize: q4_0
+  uploadToHF: true
