@@ -9,7 +9,7 @@ import (
 func NewImageConfig(c *config.FineTuneConfig) *specs.Image {
 	img := emptyImage(c)
 
-	img.Config.Entrypoint = []string{"python script.py"}
+	img.Config.Entrypoint = []string{"/script.py"}
 	return img
 }
 
@@ -24,7 +24,11 @@ func emptyImage(c *config.FineTuneConfig) *specs.Image {
 	img.Config.WorkingDir = "/"
 
 	img.Config.Env = []string{
-		"PATH=" + system.DefaultPathEnv("linux"),
+		"PATH=" + system.DefaultPathEnv("linux") + ":/usr/local/cuda/bin",
+		"NVIDIA_REQUIRE_CUDA=cuda>=12.0",
+		"NVIDIA_DRIVER_CAPABILITIES=compute,utility",
+		"NVIDIA_VISIBLE_DEVICES=all",
+		"LD_LIBRARY_PATH=/usr/local/cuda/lib64",
 	}
 
 	return img

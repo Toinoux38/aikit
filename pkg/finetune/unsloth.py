@@ -15,21 +15,19 @@ with open('config.yaml', 'r') as config_file:
     except yaml.YAMLError as exc:
         print(exc)
 
-max_seq_length = 2048  # Supports RoPE Scaling interally, so choose any!
-# Get LAION dataset
-url = "https://huggingface.co/datasets/laion/OIG/resolve/main/unified_chip2.jsonl"
+cfg = data.get('config').get('unsloth')
+
+max_seq_length = cfg.get('maxSeqLength')
+url = data.get('datasets')[0]['source']
 dataset = load_dataset("json", data_files={"train": url}, split="train")
 
-# Load Llama model
 model, tokenizer = FastLanguageModel.from_pretrained(
-    # Supports Llama, Mistral - replace this!
-    model_name="unsloth/llama-2-7b-bnb-4bit",
+    model_name=data.get('baseModel'),
     max_seq_length=max_seq_length,
     dtype=None,
     load_in_4bit=True,
 )
 
-# Do model patching and add fast LoRA weights
 model = FastLanguageModel.get_peft_model(
     model,
     r=16,
@@ -50,16 +48,16 @@ trainer = SFTTrainer(
     max_seq_length=max_seq_length,
     tokenizer=tokenizer,
     args=TrainingArguments(
-        per_device_train_batch_size=2,
-        gradient_accumulation_steps=4,
-        warmup_steps=10,
-        max_steps=60,
+        per_device_train_batch_size=cfg.get('batchSize'),
+        gradient_accumulation_steps=cfg.get('gradientAccumulationSteps'),
+        warmup_steps=cfg.get('warmupSteps'),
+        max_steps=cfg.get('maxSteps'),
         fp16=not torch.cuda.is_bf16_supported(),
         bf16=torch.cuda.is_bf16_supported(),
-        logging_steps=1,
+        logging_steps=cfg.get('loggingSteps'),
         output_dir="outputs",
-        optim="adamw_8bit",
-        seed=3407,
+        optim=cfg.get('optimizer'),
+        seed=cfg.get('seed'),
     ),
 )
 
@@ -70,4 +68,4 @@ trainer.train()
 # model.save_pretrained_gguf("model_gguf", tokenizer, quantization_method="q4_k_m")
 
 model.push_to_hub_gguf("model_gguf", tokenizer,
-                       quantization_method="q4_k_m", token="")
+                       quantization_method="q4_k_m", token="123")

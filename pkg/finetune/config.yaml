@@ -1,6 +1,7 @@
 #syntax=aikit:test
 apiVersion: v1alpha1
 debug: true
+runtime: cuda # remove
 provider: unsloth
 baseModel: unsloth/llama-2-7b-bnb-4bit
 datasets:
@@ -9,15 +10,15 @@ datasets:
 config:
   unsloth:
     maxSeqLength: 2048
-    loadIn4bit: true
+    loadIn4bit: true # maybe?
     batchSize: 2
     gradientAccumulationSteps: 4
-    warmupSteps: 10
+    warmupSteps: 5
     maxSteps: 60
-    # learningRate: 1e-4
-    # fp16: true
-    # bf16: false
-    # tf32: false
+    learningRate: 1e-4
+    fp16: true
+    bf16: false
+    tf32: false
     loggingSteps: 1
     optimizer: adamw_8bit
     weightDecay: 0.01
@@ -28,4 +29,3 @@ output:
   format: f16
   quantize: q4_0
   uploadToHF: true
-  token: 123
