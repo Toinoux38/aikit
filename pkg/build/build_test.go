@@ -8,7 +8,7 @@ import (
 
 func Test_validateConfig(t *testing.T) {
 	type args struct {
-		c *config.Config
+		c *config.InferenceConfig
 	}
 	tests := []struct {
 		name    string
@@ -17,19 +17,19 @@ func Test_validateConfig(t *testing.T) {
 	}{
 		{
 			name:    "no config",
-			args:    args{c: &config.Config{}},
+			args:    args{c: &config.InferenceConfig{}},
 			wantErr: true,
 		},
 		{
 			name: "unsupported api version",
-			args: args{c: &config.Config{
+			args: args{c: &config.InferenceConfig{
 				APIVersion: "v10",
 			}},
 			wantErr: true,
 		},
 		{
 			name: "invalid runtime",
-			args: args{c: &config.Config{
+			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1",
 				Runtime:    "foo",
 			}},
@@ -37,14 +37,14 @@ func Test_validateConfig(t *testing.T) {
 		},
 		{
 			name: "no models",
-			args: args{c: &config.Config{
+			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
 			}},
 			wantErr: true,
 		},
 		{
 			name: "valid backend",
-			args: args{c: &config.Config{
+			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
 				Runtime:    "cuda",
 				Backends:   []string{"exllama"},
@@ -59,7 +59,7 @@ func Test_validateConfig(t *testing.T) {
 		},
 		{
 			name: "invalid backend",
-			args: args{c: &config.Config{
+			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
 				Backends:   []string{"foo"},
 				Models: []config.Model{
@@ -73,7 +73,7 @@ func Test_validateConfig(t *testing.T) {
 		},
 		{
 			name: "valid backend but no cuda runtime",
-			args: args{c: &config.Config{
+			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
 				Backends:   []string{"exllama"},
 				Models: []config.Model{
@@ -87,7 +87,7 @@ func Test_validateConfig(t *testing.T) {
 		},
 		{
 			name: "invalid backend combination 1",
-			args: args{c: &config.Config{
+			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
 				Runtime:    "cuda",
 				Backends:   []string{"exllama", "exllama2"},
@@ -102,7 +102,7 @@ func Test_validateConfig(t *testing.T) {
 		},
 		{
 			name: "invalid backend combination 2",
-			args: args{c: &config.Config{
+			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
 				Runtime:    "cuda",
 				Backends:   []string{"exllama", "stablediffusion"},

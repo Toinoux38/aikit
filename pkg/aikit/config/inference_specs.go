@@ -1,6 +1,6 @@
 package config
 
-type Config struct {
+type InferenceConfig struct {
 	APIVersion string   `yaml:"apiVersion"`
 	Debug      bool     `yaml:"debug,omitempty"`
 	Runtime    string   `yaml:"runtime,omitempty"`

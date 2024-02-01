@@ -1,4 +1,4 @@
-package aikit2llb
+package inference
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ const (
 	cudaVersion    = "12-3"
 )
 
-func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
+func Aikit2LLB(c *config.InferenceConfig) (llb.State, *specs.Image) {
 	var merge llb.State
 	state := llb.Image(utils.DebianSlim)
 	base := getBaseImage(c)
@@ -50,14 +50,14 @@ func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 	return merge, imageCfg
 }
 
-func getBaseImage(c *config.Config) llb.State {
+func getBaseImage(c *config.InferenceConfig) llb.State {
 	if len(c.Backends) > 0 {
 		return llb.Image(utils.DebianSlim)
 	}
 	return llb.Image(distrolessBase)
 }
 
-func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.State) {
+func copyModels(c *config.InferenceConfig, base llb.State, s llb.State) (llb.State, llb.State) {
 	savedState := s
 	for _, model := range c.Models {
 		var opts []llb.HTTPOption
@@ -103,7 +103,7 @@ func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.S
 	return s, merge
 }
 
-func installCuda(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.State) {
+func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.State, llb.State) {
 	cudaKeyringURL := "https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb"
 	cudaKeyring := llb.HTTP(cudaKeyringURL)
 	s = s.File(
@@ -147,7 +147,7 @@ func installCuda(c *config.Config, s llb.State, merge llb.State) (llb.State, llb
 	return s, llb.Merge([]llb.State{merge, diff})
 }
 
-func installExllama(c *config.Config, s llb.State, merge llb.State) llb.State {
+func installExllama(c *config.InferenceConfig, s llb.State, merge llb.State) llb.State {
 	backend := utils.BackendExllama
 	exllamaRepo := "https://github.com/turboderp/exllama"
 	exllamaTag := "master"
@@ -211,7 +211,7 @@ func installOpenCV(s llb.State, merge llb.State) llb.State {
 	return merge
 }
 
-func addLocalAI(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.State) {
+func addLocalAI(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.State, llb.State) {
 	savedState := s
 	var localAIURL string
 	switch c.Runtime {

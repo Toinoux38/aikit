@@ -5,8 +5,8 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-func NewFromBytes(b []byte) (*Config, *FineTuneConfig, error) {
-	inferenceConfig := &Config{}
+func NewFromBytes(b []byte) (*InferenceConfig, *FineTuneConfig, error) {
+	inferenceConfig := &InferenceConfig{}
 	fineTuneConfig := &FineTuneConfig{}
 	var err error
 	err = yaml.Unmarshal(b, inferenceConfig)

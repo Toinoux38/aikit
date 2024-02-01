@@ -13,8 +13,8 @@ import (
 	"github.com/moby/buildkit/frontend/gateway/client"
 	"github.com/pkg/errors"
 	"github.com/sozercan/aikit/pkg/aikit/config"
-	"github.com/sozercan/aikit/pkg/aikit2llb"
 	"github.com/sozercan/aikit/pkg/aikit2llb/finetune"
+	"github.com/sozercan/aikit/pkg/aikit2llb/inference"
 	"github.com/sozercan/aikit/pkg/utils"
 )
 
@@ -74,13 +74,13 @@ func buildFineTune(ctx context.Context, c client.Client, cfg *config.FineTuneCon
 	return res, nil
 }
 
-func buildInference(ctx context.Context, c client.Client, cfg *config.Config) (*client.Result, error) {
+func buildInference(ctx context.Context, c client.Client, cfg *config.InferenceConfig) (*client.Result, error) {
 	err := validateConfig(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "validating aikitfile")
 	}
 
-	st, img := aikit2llb.Aikit2LLB(cfg)
+	st, img := inference.Aikit2LLB(cfg)
 
 	def, err := st.Marshal(ctx)
 	if err != nil {
@@ -109,7 +109,7 @@ func buildInference(ctx context.Context, c client.Client, cfg *config.Config) (*
 	return res, nil
 }
 
-func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Config, *config.FineTuneConfig, error) {
+func getAikitfileConfig(ctx context.Context, c client.Client) (*config.InferenceConfig, *config.FineTuneConfig, error) {
 	opts := c.BuildOpts().Opts
 	filename := opts[keyFilename]
 	if filename == "" {
@@ -168,7 +168,7 @@ func validateFinetuneConfig(c *config.FineTuneConfig) error {
 	return nil
 }
 
-func validateConfig(c *config.Config) error {
+func validateConfig(c *config.InferenceConfig) error {
 	if c.APIVersion == "" {
 		return errors.New("apiVersion is not defined")
 	}
