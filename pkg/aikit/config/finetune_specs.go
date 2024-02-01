@@ -12,22 +12,24 @@ type FineTuneConfig struct {
 }
 
 type FineTuneConfigSpec struct {
-	Common  FineTuneConfigCommonSpec  `yaml:"common,omitempty"`
 	Axolotl FineTuneConfigAxolotlSpec `yaml:"axolotl,omitempty"`
 	Unsloth FineTuneConfigUnslothSpec `yaml:"unsloth,omitempty"`
 }
 
-type FineTuneConfigCommonSpec struct {
-	Packing                   bool    `yaml:"packing,omitempty"`
+type Dataset struct {
+	Source string `yaml:"source,omitempty"`
+	Type   string `yaml:"type,omitempty"`
+}
+
+type FineTuneConfigAxolotlSpec struct{}
+
+type FineTuneConfigUnslothSpec struct {
+	MaxSeqLength              int     `yaml:"maxSeqLength,omitempty"`
 	LoadIn4bit                bool    `yaml:"loadIn4bit,omitempty"`
 	BatchSize                 int     `yaml:"batchSize,omitempty"`
 	GradientAccumulationSteps int     `yaml:"gradientAccumulationSteps,omitempty"`
 	WarmupSteps               int     `yaml:"warmupSteps,omitempty"`
 	MaxSteps                  int     `yaml:"maxSteps,omitempty"`
-	LearningRate              float64 `yaml:"learningRate,omitempty"`
-	Fp16                      bool    `yaml:"fp16,omitempty"`
-	Bf16                      bool    `yaml:"bf16,omitempty"`
-	Tf32                      bool    `yaml:"tf32,omitempty"`
 	LoggingSteps              int     `yaml:"loggingSteps,omitempty"`
 	Optimizer                 string  `yaml:"optimizer,omitempty"`
 	WeightDecay               float64 `yaml:"weightDecay,omitempty"`
@@ -35,19 +37,10 @@ type FineTuneConfigCommonSpec struct {
 	Seed                      int     `yaml:"seed,omitempty"`
 }
 
-type FineTuneConfigAxolotlSpec struct {
-	FlashAttention bool `yaml:"flashAttention,omitempty"`
-}
-
-type FineTuneConfigUnslothSpec struct {}
-
 type FineTuneOutputSpec struct {
-	Path     string `yaml:"path,omitempty"`
-	Format   string `yaml:"format,omitempty"`
-	Quantize string `yaml:"quantize,omitempty"`
-}
-
-type Dataset struct {
-	Source string `yaml:"source,omitempty"`
-	Type   string `yaml:"type,omitempty"`
+	Path       string `yaml:"path,omitempty"`
+	Format     string `yaml:"format,omitempty"`
+	Quantize   string `yaml:"quantize,omitempty"`
+	UploadToHF bool   `yaml:"uploadToHF,omitempty"`
+	Token      string `yaml:"token,omitempty"`
 }
