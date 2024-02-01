@@ -88,14 +88,14 @@ func copyModels(c *config.InferenceConfig, base llb.State, s llb.State) (llb.Sta
 		// create prompt templates if defined
 		for _, pt := range model.PromptTemplates {
 			if pt.Name != "" && pt.Template != "" {
-				s = s.Run(shf("echo -n \"%s\" > /models/%s.tmpl", pt.Template, pt.Name)).Root()
+				s = s.Run(utils.Shf("echo -n \"%s\" > /models/%s.tmpl", pt.Template, pt.Name)).Root()
 			}
 		}
 	}
 
 	// create config file if defined
 	if c.Config != "" {
-		s = s.Run(shf("echo -n \"%s\" > /config.yaml", c.Config)).Root()
+		s = s.Run(utils.Shf("echo -n \"%s\" > /config.yaml", c.Config)).Root()
 	}
 
 	diff := llb.Diff(savedState, s)
@@ -110,19 +110,19 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 		llb.Copy(cudaKeyring, utils.FileNameFromURL(cudaKeyringURL), "/"),
 		llb.WithCustomName("Copying "+utils.FileNameFromURL(cudaKeyringURL)), //nolint: goconst
 	)
-	s = s.Run(sh("dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
+	s = s.Run(utils.Sh("dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
 
 	savedState := s
 	// running apt-get update twice due to nvidia repo
-	s = s.Run(sh("apt-get update && apt-get install -y ca-certificates && apt-get update"), llb.IgnoreCache).Root()
+	s = s.Run(utils.Sh("apt-get update && apt-get install -y ca-certificates && apt-get update"), llb.IgnoreCache).Root()
 
 	// install cuda libraries
 	if len(c.Backends) == 0 {
-		s = s.Run(shf("apt-get install -y --no-install-recommends libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
+		s = s.Run(utils.Shf("apt-get install -y --no-install-recommends libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
 		// using a distroless base image here
 		// convert debian package metadata status file to distroless status.d directory
 		// clean up apt directories
-		s = s.Run(bashf("apt-get install -y --no-install-recommends libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean && mkdir -p /var/lib/dpkg/status.d && description_flag=false; while IFS= read -r line || [[ -n $line ]]; do if [[ $line == Package:* ]]; then pkg_name=$(echo $line | cut -d' ' -f2); elif [[ $line == Maintainer:* ]]; then maintainer=$(echo $line | cut -d' ' -f2-); if [[ $maintainer == 'cudatools <cudatools@nvidia.com>' ]]; then pkg_file=/var/lib/dpkg/status.d/${pkg_name}; echo 'Package: '$pkg_name > $pkg_file; echo $line >> $pkg_file; else pkg_file=''; fi; elif [[ -n $pkg_file ]]; then if [[ $line == Description:* ]]; then description_flag=true; elif [[ $line == '' ]]; then description_flag=false; elif ! $description_flag; then echo $line >> $pkg_file; fi; fi; done < /var/lib/dpkg/status && find /var/lib/dpkg -mindepth 1 ! -regex '^/var/lib/dpkg/status\\.d\\(/.*\\)?' -delete && rm -r /var/lib/apt", cudaVersion)).Root()
+		s = s.Run(utils.Bashf("apt-get install -y --no-install-recommends libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean && mkdir -p /var/lib/dpkg/status.d && description_flag=false; while IFS= read -r line || [[ -n $line ]]; do if [[ $line == Package:* ]]; then pkg_name=$(echo $line | cut -d' ' -f2); elif [[ $line == Maintainer:* ]]; then maintainer=$(echo $line | cut -d' ' -f2-); if [[ $maintainer == 'cudatools <cudatools@nvidia.com>' ]]; then pkg_file=/var/lib/dpkg/status.d/${pkg_name}; echo 'Package: '$pkg_name > $pkg_file; echo $line >> $pkg_file; else pkg_file=''; fi; elif [[ -n $pkg_file ]]; then if [[ $line == Description:* ]]; then description_flag=true; elif [[ $line == '' ]]; then description_flag=false; elif ! $description_flag; then echo $line >> $pkg_file; fi; fi; done < /var/lib/dpkg/status && find /var/lib/dpkg -mindepth 1 ! -regex '^/var/lib/dpkg/status\\.d\\(/.*\\)?' -delete && rm -r /var/lib/apt", cudaVersion)).Root()
 	}
 
 	// installing dev dependencies used for exllama
@@ -134,12 +134,12 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 			}
 			exllamaDeps := fmt.Sprintf("apt-get install -y --no-install-recommends cuda-cudart-dev-%[1]s cuda-crt-%[1]s libcusparse-dev-%[1]s libcublas-dev-%[1]s libcusolver-dev-%[1]s cuda-nvcc-%[1]s %[2]s && apt-get clean", cudaVersion, exllama2Dep)
 
-			s = s.Run(sh(exllamaDeps)).Root()
+			s = s.Run(utils.Sh(exllamaDeps)).Root()
 		}
 
 		if c.Backends[b] == utils.BackendMamba {
 			mambaDeps := fmt.Sprintf("apt-get install -y --no-install-recommends cuda-crt-%[1]s cuda-cudart-dev-%[1]s cuda-nvcc-%[1]s && apt-get clean", cudaVersion)
-			s = s.Run(sh(mambaDeps)).Root()
+			s = s.Run(utils.Sh(mambaDeps)).Root()
 		}
 	}
 
@@ -160,13 +160,13 @@ func installExllama(c *config.InferenceConfig, s llb.State, merge llb.State) llb
 	}
 
 	savedState := s
-	s = s.Run(sh("apt-get update && apt-get install --no-install-recommends -y git ca-certificates python3-pip python3-dev g++ && apt-get clean"), llb.IgnoreCache).Root()
+	s = s.Run(utils.Sh("apt-get update && apt-get install --no-install-recommends -y git ca-certificates python3-pip python3-dev g++ && apt-get clean"), llb.IgnoreCache).Root()
 
 	// clone localai exllama backend only
 	s = cloneLocalAI(s, backend)
 
 	// clone exllama to localai exllama backend path and install python dependencies
-	s = s.Run(shf("git clone --depth 1 %[1]s --branch %[2]s /tmp/%[3]s && mv /tmp/%[3]s/* /tmp/localai/backend/python/%[3]s && rm -rf /tmp/%[3]s && cd /tmp/localai/backend/python/%[3]s && rm -rf .git && pip3 install grpcio protobuf typing-extensions sympy mpmath setuptools numpy --break-system-packages && pip3 install -r /tmp/localai/backend/python/%[3]s/requirements.txt --break-system-packages", exllamaRepo, exllamaTag, backend)).Root()
+	s = s.Run(utils.Shf("git clone --depth 1 %[1]s --branch %[2]s /tmp/%[3]s && mv /tmp/%[3]s/* /tmp/localai/backend/python/%[3]s && rm -rf /tmp/%[3]s && cd /tmp/localai/backend/python/%[3]s && rm -rf .git && pip3 install grpcio protobuf typing-extensions sympy mpmath setuptools numpy --break-system-packages && pip3 install -r /tmp/localai/backend/python/%[3]s/requirements.txt --break-system-packages", exllamaRepo, exllamaTag, backend)).Root()
 
 	diff := llb.Diff(savedState, s)
 	return llb.Merge([]llb.State{merge, diff})
@@ -175,11 +175,11 @@ func installExllama(c *config.InferenceConfig, s llb.State, merge llb.State) llb
 func installMamba(s llb.State, merge llb.State) llb.State {
 	savedState := s
 	// libexpat1 is requirement but git is not. however libexpat1 is a dependency of git
-	s = s.Run(sh("apt-get install --no-install-recommends -y git python3 python3-dev python3-pip libssl3 openssl && apt-get clean"), llb.IgnoreCache).Root()
+	s = s.Run(utils.Sh("apt-get install --no-install-recommends -y git python3 python3-dev python3-pip libssl3 openssl && apt-get clean"), llb.IgnoreCache).Root()
 
 	s = cloneLocalAI(s, utils.BackendMamba)
 
-	s = s.Run(shf("pip3 install packaging numpy torch==2.1.0 grpcio protobuf --break-system-packages && pip3 install causal-conv1d==1.0.0 mamba-ssm==1.0.1 --break-system-packages")).Root()
+	s = s.Run(utils.Shf("pip3 install packaging numpy torch==2.1.0 grpcio protobuf --break-system-packages && pip3 install causal-conv1d==1.0.0 mamba-ssm==1.0.1 --break-system-packages")).Root()
 
 	diff := llb.Diff(savedState, s)
 	return llb.Merge([]llb.State{merge, diff})
@@ -188,10 +188,10 @@ func installMamba(s llb.State, merge llb.State) llb.State {
 func installOpenCV(s llb.State, merge llb.State) llb.State {
 	savedState := s
 	// adding debian 11 (bullseye) repo due to opencv 4.5 requirement
-	s = s.Run(sh("echo 'deb http://deb.debian.org/debian bullseye main' | tee -a /etc/apt/sources.list")).Root()
+	s = s.Run(utils.Sh("echo 'deb http://deb.debian.org/debian bullseye main' | tee -a /etc/apt/sources.list")).Root()
 	// pinning libdap packages to bullseye version due to symbol error
 	libdapVersion := "3.20.7-6"
-	s = s.Run(shf("apt-get update && mkdir -p /tmp/generated/images && apt-get install -y libopencv-imgcodecs4.5 libgomp1 libdap27=%[1]s libdapclient6v5=%[1]s && apt-get clean", libdapVersion), llb.IgnoreCache).Root()
+	s = s.Run(utils.Shf("apt-get update && mkdir -p /tmp/generated/images && apt-get install -y libopencv-imgcodecs4.5 libgomp1 libdap27=%[1]s libdapclient6v5=%[1]s && apt-get clean", libdapVersion), llb.IgnoreCache).Root()
 	diff := llb.Diff(savedState, s)
 	merge = llb.Merge([]llb.State{merge, diff})
 
@@ -239,17 +239,5 @@ func addLocalAI(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.St
 }
 
 func cloneLocalAI(s llb.State, backend string) llb.State {
-	return s.Run(shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/%[2]s && git checkout %[3]s && rm -rf .git", localAIRepo, backend, localAIVersion)).Root()
-}
-
-func shf(cmd string, v ...interface{}) llb.RunOption {
-	return llb.Args([]string{"/bin/sh", "-c", fmt.Sprintf(cmd, v...)})
-}
-
-func sh(cmd string) llb.RunOption {
-	return llb.Args([]string{"/bin/sh", "-c", cmd})
-}
-
-func bashf(cmd string, v ...interface{}) llb.RunOption {
-	return llb.Args([]string{"/bin/bash", "-c", fmt.Sprintf(cmd, v...)})
+	return s.Run(utils.Shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/%[2]s && git checkout %[3]s && rm -rf .git", localAIRepo, backend, localAIVersion)).Root()
 }

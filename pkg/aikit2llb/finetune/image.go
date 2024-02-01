@@ -9,7 +9,7 @@ import (
 func NewImageConfig(c *config.FineTuneConfig) *specs.Image {
 	img := emptyImage(c)
 
-	img.Config.Entrypoint = []string{"/script.py"}
+	img.Config.Entrypoint = []string{"/provider_unsloth.py"}
 	return img
 }
 
