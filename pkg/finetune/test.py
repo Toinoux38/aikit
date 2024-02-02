@@ -7,9 +7,15 @@ with open('config.yaml', 'r') as config_file:
     except yaml.YAMLError as exc:
         print(exc)
 
-cfg = data.get('config').get('unsloth')
-ml = cfg.get('maxSeqLength')
-print(ml)
+output = data.get('output')
+
+if output.get('token') != "":
+    print('hi')
+
+
+# cfg = data.get('config').get('unsloth')
+# ml = cfg.get('maxSeqLength')
+# print(ml)
 
 
 # ds = data.get('datasets')[0]['source']

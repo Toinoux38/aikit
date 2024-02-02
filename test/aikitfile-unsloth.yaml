@@ -23,5 +23,4 @@ output:
   path: path/to/model
   format: f16
   quantize: q4_0
-  uploadToHF: true
   token: 123
