@@ -56,7 +56,7 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 	}
 	state = state.Run(utils.Shf("echo -n \"%s\" > /config.yaml", string(cfg))).Root()
 
-	// state = state.Run(utils.Sh("/provider_unsloth.py")).Root()
+	state = state.Run(utils.Sh("/provider_unsloth.py")).Root()
 
 	// scratch := llb.Scratch().File(llb.Copy(state, "/provider_unsloth.py", "/provider_unsloth.py"))
 
