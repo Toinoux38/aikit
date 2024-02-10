@@ -65,10 +65,11 @@ trainer.train()
 
 # model.save_pretrained("lora_model")  # Local saving
 
-# model.save_pretrained_gguf("model_gguf", tokenizer, quantization_method="q4_k_m")
+model.save_pretrained_gguf("model_gguf", tokenizer,
+                           quantization_method="q4_k_m")
 
-output = data.get('output')
+# output = data.get('output')
 
-if output.get('token') != "":
-    model.push_to_hub_gguf("model_gguf", tokenizer,
-                           quantization_method=output.get('quantize'), token=output.get('token'))
+# if output.get('token') != "":
+#     model.push_to_hub_gguf("model_gguf", tokenizer,
+#                            quantization_method=output.get('quantize'), token=output.get('token'))
