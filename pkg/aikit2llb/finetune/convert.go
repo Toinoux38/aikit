@@ -2,6 +2,7 @@ package finetune
 
 import (
 	"github.com/moby/buildkit/client/llb"
+	"github.com/moby/buildkit/util/system"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/sozercan/aikit/pkg/aikit/config"
 	"github.com/sozercan/aikit/pkg/utils"
@@ -11,7 +12,19 @@ import (
 func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 	imageCfg := NewImageConfig(c)
 
+	env := map[string]string{
+		"PATH":                       system.DefaultPathEnv("linux") + ":/usr/local/cuda/bin",
+		"NVIDIA_REQUIRE_CUDA":        "cuda>=12.0",
+		"NVIDIA_DRIVER_CAPABILITIES": "compute,utility",
+		"NVIDIA_VISIBLE_DEVICES":     "all",
+		"LD_LIBRARY_PATH":            "/usr/local/cuda/lib64",
+	}
+
 	state := llb.Image(utils.DebianSlim)
+	for k, v := range env {
+		state = state.AddEnv(k, v)
+	}
+
 	state = state.Run(utils.Sh("apt-get update && apt-get install -y python3 python3-pip python-is-python3 git"), llb.IgnoreCache).Root()
 
 	cudaKeyringURL := "https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb"
@@ -43,9 +56,9 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 	}
 	state = state.Run(utils.Shf("echo -n \"%s\" > /config.yaml", string(cfg))).Root()
 
-	state = state.Run(utils.Sh("/provider_unsloth.py")).Root()
+	// state = state.Run(utils.Sh("/provider_unsloth.py")).Root()
 
-	scratch := llb.Scratch().File(llb.Copy(state, "/provider_unsloth.py", "/provider_unsloth.py"))
+	// scratch := llb.Scratch().File(llb.Copy(state, "/provider_unsloth.py", "/provider_unsloth.py"))
 
-	return scratch, imageCfg
+	return state, imageCfg
 }
