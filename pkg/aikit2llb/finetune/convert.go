@@ -20,10 +20,15 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 		"LD_LIBRARY_PATH":            "/usr/local/cuda/lib64",
 	}
 
-	state := llb.Image(utils.DebianSlim)
+	state := llb.Image("docker.io/sozercan/nvidia:545-23-06")
 	for k, v := range env {
 		state = state.AddEnv(k, v)
 	}
+
+	// var runOpts []llb.RunOption
+	// runOpts = append(runOpts, llb.Security(llb.SecurityModeInsecure))
+
+	// state = state.Run(utils.Sh("mknod --mode 666 /dev/nvidiactl c 195 255 && mknod --mode 666 /dev/nvidia-modeset c 195 254 && mknod --mode 666 /dev/nvidia-uvm c 235 0 && mknod --mode 666 /dev/nvidia-uvm-tools c 235 1 && mknod --mode 666 /dev/nvidia0 c 195 0 && chmod 0666 /dev/nvidia* && ls -al /dev && /root/NVIDIA-Linux-x86_64-545.23.06/nvidia-smi"), llb.Security(llb.SecurityModeInsecure)).Root()
 
 	state = state.Run(utils.Sh("apt-get update && apt-get install -y python3 python3-pip python-is-python3 git"), llb.IgnoreCache).Root()
 
@@ -37,8 +42,8 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 
 	// TODO: use required packages instead of cuda-toolkit if possible
 	state = state.Run(utils.Sh("apt-get update && apt-get install -y --no-install-recommends cuda-toolkit cuda-nvcc-12-3 && apt-get clean")).Root()
-	state = state.Run(utils.Sh("pip install packaging torch==2.1.0 ipython --break-system-packages")).Root()
-	state = state.Run(utils.Sh("pip install 'unsloth[cu121_ampere] @ git+https://github.com/unslothai/unsloth.git' --break-system-packages")).Root()
+	state = state.Run(utils.Sh("pip install --upgrade pip && pip install packaging torch==2.1.0 ipython")).Root()
+	state = state.Run(utils.Sh("pip install 'unsloth[cu121_ampere] @ git+https://github.com/unslothai/unsloth.git'")).Root()
 
 	// TODO: replace the branch with a release tag and have it update with a release
 	unslothScriptURL := "https://raw.githubusercontent.com/sozercan/aikit/finetune/pkg/finetune/provider_unsloth.py"
@@ -56,9 +61,11 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 	}
 	state = state.Run(utils.Shf("echo -n \"%s\" > /config.yaml", string(cfg))).Root()
 
-	state = state.Run(utils.Sh("/provider_unsloth.py")).Root()
+	state = state.Run(utils.Sh("mknod --mode 666 /dev/nvidiactl c 195 255 && mknod --mode 666 /dev/nvidia-modeset c 195 254 && mknod --mode 666 /dev/nvidia-uvm c 235 0 && mknod --mode 666 /dev/nvidia-uvm-tools c 235 1 && mknod --mode 666 /dev/nvidia0 c 195 0 && chmod 0666 /dev/nvidia* && ls -al /dev && /root/NVIDIA-Linux-x86_64-545.23.06/nvidia-smi && /provider_unsloth.py"), llb.Security(llb.SecurityModeInsecure)).Root()
 
-	// scratch := llb.Scratch().File(llb.Copy(state, "/provider_unsloth.py", "/provider_unsloth.py"))
+	// state = state.Run(utils.Sh("/provider_unsloth.py")).Root()
 
-	return state, imageCfg
+	scratch := llb.Scratch().File(llb.Copy(state, "model_gguf-unsloth.Q4_K_M.gguf", "model_gguf-unsloth.Q4_K_M.gguf"))
+
+	return scratch, imageCfg
 }
