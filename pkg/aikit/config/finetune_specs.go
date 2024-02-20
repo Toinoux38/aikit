@@ -39,4 +39,5 @@ type FineTuneConfigUnslothSpec struct {
 
 type FineTuneOutputSpec struct {
 	Quantize string `yaml:"quantize,omitempty"`
+	Name     string `yaml:"name,omitempty"`
 }

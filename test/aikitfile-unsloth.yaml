@@ -21,5 +21,6 @@ config:
     seed: 42
 output:
   quantize: q8_0
+  name: model
   # TODO: different output types?
   # TODO: file name?

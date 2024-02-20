@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# https://colab.research.google.com/drive/1Dyauq4kTZoLewQ1cApceUQVNcnnNTzg_?usp=sharing#scrollTo=FqfebeAdT073
+# https://colab.research.google.com/drive/1Dyauq4kTZoLewQ1cApceUQVNcnnNTzg_?usp=sharing
 
 from unsloth import FastLanguageModel
 import torch
@@ -11,7 +11,7 @@ import yaml
 with open('config.yaml', 'r') as config_file:
     try:
         data = yaml.safe_load(config_file)
-        print(data)
+        print(data)   # TODO: remove this
     except yaml.YAMLError as exc:
         print(exc)
 
@@ -60,10 +60,8 @@ trainer = SFTTrainer(
         seed=cfg.get('seed'),
     ),
 )
-
 trainer.train()
 
-out = data.get('output')
-
-model.save_pretrained_gguf("model_gguf", tokenizer,
-                           quantization_method=out.get('quantize'))
+output = data.get('output')
+model.save_pretrained_gguf(output.get('name'), tokenizer,
+                           quantization_method=output.get('quantize'))

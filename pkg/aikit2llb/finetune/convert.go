@@ -1,6 +1,8 @@
 package finetune
 
 import (
+	"fmt"
+
 	"github.com/moby/buildkit/client/llb"
 	"github.com/moby/buildkit/util/system"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
@@ -66,7 +68,8 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 	// TODO: remove ls /dev and nvidia-smi
 	state = state.Run(utils.Sh("mknod --mode 666 /dev/nvidiactl c 195 255 && mknod --mode 666 /dev/nvidia-modeset c 195 254 && mknod --mode 666 /dev/nvidia-uvm c 235 0 && mknod --mode 666 /dev/nvidia-uvm-tools c 235 1 && mknod --mode 666 /dev/nvidia0 c 195 0 && chmod 0666 /dev/nvidia* && ls -al /dev && /root/NVIDIA-Linux-x86_64-545.23.06/nvidia-smi && /provider_unsloth.py"), llb.Security(llb.SecurityModeInsecure)).Root()
 
-	scratch := llb.Scratch().File(llb.Copy(state, "model_gguf-unsloth.Q4_K_M.gguf", "model_gguf-unsloth.Q4_K_M.gguf"))
+	output := fmt.Sprintf("%s-unsloth.%s.gguf", c.Output.Name, c.Output.Quantize)
+	scratch := llb.Scratch().File(llb.Copy(state, output, output))
 
 	return scratch, imageCfg
 }
