@@ -63,13 +63,7 @@ trainer = SFTTrainer(
 
 trainer.train()
 
-# model.save_pretrained("lora_model")  # Local saving
+out = data.get('output')
 
 model.save_pretrained_gguf("model_gguf", tokenizer,
-                           quantization_method="q4_k_m")
-
-# output = data.get('output')
-
-# if output.get('token') != "":
-#     model.push_to_hub_gguf("model_gguf", tokenizer,
-#                            quantization_method=output.get('quantize'), token=output.get('token'))
+                           quantization_method=out.get('quantize'))

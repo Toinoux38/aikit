@@ -12,6 +12,7 @@ import (
 func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 	imageCfg := NewImageConfig(c)
 
+	// TODO: not sure if these are necessary
 	env := map[string]string{
 		"PATH":                       system.DefaultPathEnv("linux") + ":/usr/local/cuda/bin",
 		"NVIDIA_REQUIRE_CUDA":        "cuda>=12.0",
@@ -20,6 +21,7 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 		"LD_LIBRARY_PATH":            "/usr/local/cuda/lib64",
 	}
 
+	// TODO: need input from the user or set up requirements with nvidia-container-cli
 	state := llb.Image("docker.io/sozercan/nvidia:545-23-06")
 	for k, v := range env {
 		state = state.AddEnv(k, v)
@@ -61,9 +63,8 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 	}
 	state = state.Run(utils.Shf("echo -n \"%s\" > /config.yaml", string(cfg))).Root()
 
+	// TODO: remove ls /dev and nvidia-smi
 	state = state.Run(utils.Sh("mknod --mode 666 /dev/nvidiactl c 195 255 && mknod --mode 666 /dev/nvidia-modeset c 195 254 && mknod --mode 666 /dev/nvidia-uvm c 235 0 && mknod --mode 666 /dev/nvidia-uvm-tools c 235 1 && mknod --mode 666 /dev/nvidia0 c 195 0 && chmod 0666 /dev/nvidia* && ls -al /dev && /root/NVIDIA-Linux-x86_64-545.23.06/nvidia-smi && /provider_unsloth.py"), llb.Security(llb.SecurityModeInsecure)).Root()
-
-	// state = state.Run(utils.Sh("/provider_unsloth.py")).Root()
 
 	scratch := llb.Scratch().File(llb.Copy(state, "model_gguf-unsloth.Q4_K_M.gguf", "model_gguf-unsloth.Q4_K_M.gguf"))
 

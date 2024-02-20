@@ -38,8 +38,5 @@ type FineTuneConfigUnslothSpec struct {
 }
 
 type FineTuneOutputSpec struct {
-	Path       string `yaml:"path,omitempty"`
-	Format     string `yaml:"format,omitempty"`
-	Quantize   string `yaml:"quantize,omitempty"`
-	Token      string `yaml:"token,omitempty"`
+	Quantize string `yaml:"quantize,omitempty"`
 }

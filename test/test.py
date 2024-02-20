@@ -1,6 +1,6 @@
 import yaml
 
-with open('config.yaml', 'r') as config_file:
+with open('aikitfile-unsloth.yaml', 'r') as config_file:
     try:
         data = yaml.safe_load(config_file)
         # print(data)

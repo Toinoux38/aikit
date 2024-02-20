@@ -1,7 +1,7 @@
 #syntax=aikit:test
 apiVersion: v1alpha1
-debug: true
-provider: unsloth
+debug: true # TODO: remove?
+provider: unsloth # TODO: use --target instead of this
 baseModel: unsloth/llama-2-7b-bnb-4bit
 datasets:
   - source: "https://huggingface.co/datasets/laion/OIG/resolve/main/unified_chip2.jsonl"
@@ -20,7 +20,6 @@ config:
     lrSchedular: linear
     seed: 42
 output:
-  path: path/to/model
-  format: f16
-  quantize: q4_0
-  token: 123
+  quantize: q8_0
+  # TODO: different output types?
+  # TODO: file name?
