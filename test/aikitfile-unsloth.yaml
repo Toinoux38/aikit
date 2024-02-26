@@ -8,6 +8,7 @@ datasets:
     type: alpaca
 config:
   unsloth:
+    # TODO: add validations
     maxSeqLength: 2048
     loadIn4bit: true
     batchSize: 2
@@ -23,4 +24,3 @@ output:
   quantize: q8_0
   name: model
   # TODO: different output types?
-  # TODO: file name?
