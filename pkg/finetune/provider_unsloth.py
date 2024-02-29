@@ -47,17 +47,22 @@ trainer = SFTTrainer(
     dataset_text_field="text",
     max_seq_length=max_seq_length,
     tokenizer=tokenizer,
+    dataset_num_proc = 2,
+    packing = cfg.get('packing'), # Can make training 5x faster for short sequences.
     args=TrainingArguments(
         per_device_train_batch_size=cfg.get('batchSize'),
         gradient_accumulation_steps=cfg.get('gradientAccumulationSteps'),
         warmup_steps=cfg.get('warmupSteps'),
         max_steps=cfg.get('maxSteps'),
+        learning_rate = cfg.get('learningRate'),
         fp16=not torch.cuda.is_bf16_supported(),
         bf16=torch.cuda.is_bf16_supported(),
         logging_steps=cfg.get('loggingSteps'),
-        output_dir="outputs",
         optim=cfg.get('optimizer'),
+        weight_decay = cfg.get('weightDecay'),
+        lr_scheduler_type = cfg.get('lrSchedulerType'),
         seed=cfg.get('seed'),
+        output_dir="outputs",
     ),
 )
 trainer.train()

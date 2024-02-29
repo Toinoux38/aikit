@@ -22,16 +22,18 @@ type Dataset struct {
 type FineTuneConfigAxolotlSpec struct{}
 
 type FineTuneConfigUnslothSpec struct {
+	Packing                   bool    `yaml:"packing,omitempty"`
 	MaxSeqLength              int     `yaml:"maxSeqLength,omitempty"`
 	LoadIn4bit                bool    `yaml:"loadIn4bit,omitempty"`
 	BatchSize                 int     `yaml:"batchSize,omitempty"`
 	GradientAccumulationSteps int     `yaml:"gradientAccumulationSteps,omitempty"`
 	WarmupSteps               int     `yaml:"warmupSteps,omitempty"`
 	MaxSteps                  int     `yaml:"maxSteps,omitempty"`
+	LearningRate              float64 `yaml:"learningRate,omitempty"`
 	LoggingSteps              int     `yaml:"loggingSteps,omitempty"`
 	Optimizer                 string  `yaml:"optimizer,omitempty"`
 	WeightDecay               float64 `yaml:"weightDecay,omitempty"`
-	LrSchedular               string  `yaml:"lrSchedular,omitempty"`
+	LrSchedulerType           string  `yaml:"lrSchedulerType,omitempty"`
 	Seed                      int     `yaml:"seed,omitempty"`
 }
 
