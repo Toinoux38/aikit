@@ -15,7 +15,7 @@ import (
 const (
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
-	localAIVersion = "v2.6.1"
+	localAIVersion = "v2.9.0"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	cudaVersion    = "12-3"
 )
@@ -191,7 +191,8 @@ func installOpenCV(s llb.State, merge llb.State) llb.State {
 	s = s.Run(utils.Sh("echo 'deb http://deb.debian.org/debian bullseye main' | tee -a /etc/apt/sources.list")).Root()
 	// pinning libdap packages to bullseye version due to symbol error
 	libdapVersion := "3.20.7-6"
-	s = s.Run(utils.Shf("apt-get update && mkdir -p /tmp/generated/images && apt-get install -y libopencv-imgcodecs4.5 libgomp1 libdap27=%[1]s libdapclient6v5=%[1]s && apt-get clean", libdapVersion), llb.IgnoreCache).Root()
+	libPath := "/usr/lib/x86_64-linux-gnu"
+	s = s.Run(utils.Shf("apt-get update && mkdir -p /tmp/generated/images && apt-get install -y libopencv-imgcodecs4.5 libgomp1 libdap27=%[1]s libdapclient6v5=%[1]s && apt-get clean && ln -s %[2]s/libopencv_core.so.4.5 %[2]s/libopencv_core.so.4.5d && ln -s %[2]s/libopencv_imgcodecs.so.4.5 %[2]s/libopencv_imgcodecs.so.4.5d", libdapVersion, libPath), llb.IgnoreCache).Root()
 	diff := llb.Diff(savedState, s)
 	merge = llb.Merge([]llb.State{merge, diff})
 
@@ -216,7 +217,7 @@ func addLocalAI(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.St
 	var localAIURL string
 	switch c.Runtime {
 	case utils.RuntimeNVIDIA:
-		localAIURL = fmt.Sprintf("https://sertaccdn.azureedge.net/localai/%s/cuda12/local-ai", localAIVersion)
+		localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-cuda12-Linux-x86_64", localAIVersion)
 	case utils.RuntimeCPUAVX2:
 		localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-avx2-Linux-x86_64", localAIVersion)
 	case utils.RuntimeCPUAVX512:
