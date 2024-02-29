@@ -22,7 +22,7 @@ type Dataset struct {
 type FineTuneConfigAxolotlSpec struct{}
 
 type FineTuneConfigUnslothSpec struct {
-	Packing                   bool    `yaml:"packing,omitempty"`
+	Packing                   bool    `yaml:"packing"`
 	MaxSeqLength              int     `yaml:"maxSeqLength,omitempty"`
 	LoadIn4bit                bool    `yaml:"loadIn4bit,omitempty"`
 	BatchSize                 int     `yaml:"batchSize,omitempty"`

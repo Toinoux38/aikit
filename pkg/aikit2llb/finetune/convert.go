@@ -13,7 +13,7 @@ import (
 
 const (
 	// https://github.com/unslothai/unsloth/releases/tag/February-2024
-	unslothCommitSHA = "3e4c5a323c16bbda2c92212b790073c4e99c2a55"
+	unslothCommitSHA = "dbba69b085b9d6049b57b48b882af7e9f29df5b2"
 	nvidiaMknod      = "mknod --mode 666 /dev/nvidiactl c 195 255 && mknod --mode 666 /dev/nvidia-uvm c 235 0 && mknod --mode 666 /dev/nvidia-uvm-tools c 235 1 && mknod --mode 666 /dev/nvidia0 c 195 0 && nvidia-smi"
 )
 
