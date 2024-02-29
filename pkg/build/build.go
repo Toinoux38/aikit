@@ -157,6 +157,13 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Inference
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "getting config")
 	}
+	if finetuneCfg != nil {
+		target, ok := opts["target"]
+		if !ok {
+			target = "unsloth"
+		}
+		finetuneCfg.Target = target
+	}
 
 	return inferenceCfg, finetuneCfg, nil
 }

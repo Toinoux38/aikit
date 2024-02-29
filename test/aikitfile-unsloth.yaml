@@ -1,7 +1,5 @@
 #syntax=sozercan/aikit:test
 apiVersion: v1alpha1
-debug: true # TODO: remove?
-provider: unsloth # TODO: use --target instead of this
 baseModel: unsloth/llama-2-7b-bnb-4bit
 datasets:
   - source: "https://huggingface.co/datasets/laion/OIG/resolve/main/unified_chip2.jsonl"
@@ -23,4 +21,3 @@ config:
 output:
   quantize: q8_0
   name: model
-  # TODO: different output types?

@@ -2,9 +2,7 @@ package config
 
 type FineTuneConfig struct {
 	APIVersion string             `yaml:"apiVersion"`
-	Debug      bool               `yaml:"debug,omitempty"`
-	Runtime    string             `yaml:"runtime,omitempty"`
-	Provider   string             `yaml:"provider,omitempty"`
+	Target     string             `yaml:"target,omitempty"`
 	BaseModel  string             `yaml:"baseModel,omitempty"`
 	Datasets   []Dataset          `yaml:"datasets"`
 	Config     FineTuneConfigSpec `yaml:"config,omitempty"`
