@@ -5,10 +5,6 @@ title: Fine Tuning
 Fine tuning process allows the adaptation of pre-trained models to domain-specific data. At this time, AIKit fine tuning process is only supported with NVIDIA GPUs.
 
 :::note
-This is an experimental feature and it may change in the future.
-:::
-
-:::note
 Due to current BuildKit and NVIDIA limitations, your host GPU driver version must match the driver that AIKit will install into the container during build. 
 
 To find your host GPU driver, you can run `nvidia-smi` or `cat /proc/driver/nvidia/version`
@@ -38,7 +34,7 @@ docker buildx create --name aikit-builder --use --buildkitd-flags '--allow-insec
 Containerd image store requires Docker v24 and later.
 :::
 
-You can enable [containerd image store](https://docs.docker.com/storage/containerd/) by editing `/etc/docker/daemon.json` to add the following configuration, and restarting the service with `sudo systemctl restart docker`. 
+You can enable [containerd image store](https://docs.docker.com/storage/containerd/) and required security entitlements for GPU device access by editing `/etc/docker/daemon.json` to add the following configuration:
 
 ```json
 {
@@ -53,6 +49,8 @@ You can enable [containerd image store](https://docs.docker.com/storage/containe
     }
 }
 ```
+
+After editing `/etc/docker/daemon.json`, restart the service with `sudo systemctl restart docker`. 
 
 ## Targets and Configuration
 
@@ -87,8 +85,8 @@ config:
     lrSchedulerType: linear
     seed: 42
 output:
-  quantize: q8_0
   name: model
+  quantize: q8_0
 ```
 
 :::note
@@ -104,12 +102,12 @@ docker buildx build --builder aikit-builder --allow security.insecure --file "/p
 ```
 
 :::tip
-If you are using containerd image store option, you can build with `docker build` which will default to the default containerd builder.
+If you are using containerd image store option, you can build with `docker build` which will default to the `default` `docker` driver builder.
 :::
 
 Depending on your setup and configuration, build process may take some time. At the end of the build, the fine-tuned model will automatically be quantized with the specified format and output to the path specified in the `--output`.
 
-Output will be a GGUF file that is named from the config output name and quantization configuration above. For example:
+Output will be a `GGUF` file with the name and quanization format from the configuration. For example:
 
 ```bash
 $ ls -al _output
