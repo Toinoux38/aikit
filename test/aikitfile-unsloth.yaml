@@ -22,5 +22,5 @@ config:
     lrSchedulerType: linear
     seed: 42
 output:
-  quantize: q8_0
+  quantize: q4_k_m
   name: model

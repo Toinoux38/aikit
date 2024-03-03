@@ -4,7 +4,7 @@ debug: true
 runtime: cuda
 models:
   - name: custom
-    source: model-q8_0.gguf
+    source: model-q4_k_m.gguf
 config: |
   - name: custom
     backend: llama
@@ -12,7 +12,7 @@ config: |
       top_k: 80
       temperature: 0.2
       top_p: 0.7
-      model: model-q8_0.gguf
+      model: model-q4_k_m.gguf
     context_size: 4096
     gpu_layers: 35
     f16: true

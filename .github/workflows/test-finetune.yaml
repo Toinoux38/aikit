@@ -1,4 +1,4 @@
-name: docker-test-gpu
+name: docker-test-finetune
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ permissions: read-all
 jobs:
   test:
     runs-on: self-hosted
-    timeout-minutes: 240
+    timeout-minutes: 360
     steps:
       - name: cleanup workspace
         run: |
@@ -18,11 +18,12 @@ jobs:
 
         # use default docker driver builder with containerd image store for local aikit image
         # must have insecure security entitlement for finetuning
+        # these must be setup before running this test
       - run: docker buildx use default
 
       - name: build aikit
         run: |
-          docker buildx build . -t aikit:test \
+          docker build . -t aikit:test \
             --load --provenance=false --progress plain
 
       - name: build finetuned model
@@ -31,12 +32,13 @@ jobs:
             --file test/aikitfile-unsloth.yaml --output _output \
             --target unsloth --progress plain .
 
-      - name: check output
-        run: test -f _output/model-q8_0.gguf
+      - name: check if finetuned model exists
+        run: test -f _output/model-q4_k_m.gguf
       
       - name: build custom model
+        working-directory: _output
         run: |
-          docker buildx build . -t custommodel:test \
+          docker build . -t custommodel:test \
             -f test/aikitfile-unsloth-custom.yaml \
             --load --provenance=false --progress plain
 
@@ -68,6 +70,10 @@ jobs:
 
       - run: docker system prune -a -f --volumes
         if: always()
+
+      - run: clean up output
+        if: always()
+        run: rm -rf _output
 
       - name: publish test artifacts
         if: always()
