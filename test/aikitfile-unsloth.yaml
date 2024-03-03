@@ -4,6 +4,7 @@ baseModel: unsloth/llama-2-7b-bnb-4bit
 datasets:
   - source: "https://huggingface.co/datasets/laion/OIG/resolve/main/unified_chip2.jsonl"
     type: alpaca
+    # TODO: figure out type
 config:
   unsloth:
     # TODO: add validations

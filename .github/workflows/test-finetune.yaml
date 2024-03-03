@@ -34,46 +34,45 @@ jobs:
       - name: check output
         run: test -f _output/model-q8_0.gguf
       
-      # TODO: local file loading
-      # - name: build test model
-      #   run: |
-      #     docker buildx build . -t testmodel:test \
-      #       -f test/aikitfile-unsloth-test.yaml \
-      #       --load --provenance=false --progress plain
+      - name: build custom model
+        run: |
+          docker buildx build . -t custommodel:test \
+            -f test/aikitfile-unsloth-custom.yaml \
+            --load --provenance=false --progress plain
 
-      # - name: list images
-      #   run: docker images
+      - name: list images
+        run: docker images
 
-      # - name: run test model
-      #   run: docker run --name testmodel -d --rm -p 8080:8080 --gpus all testmodel:test
+      - name: run test model
+        run: docker run --name custommodel -d --rm -p 8080:8080 --gpus all custommodel:test
 
-      # - name: run test
-      #   run: |
-      #     result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
-      #       "model": "custom",
-      #       "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
-      #     }')
-      #     echo $result
+      - name: run test
+        run: |
+          result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+            "model": "custom",
+            "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
+          }')
+          echo $result
 
-      #     choices=$(echo "$result" | jq '.choices')
-      #     if [ -z "$choices" ]; then
-      #       exit 1
-      #     fi
+          choices=$(echo "$result" | jq '.choices')
+          if [ -z "$choices" ]; then
+            exit 1
+          fi
 
-      # - name: save logs
-      #   if: always()
-      #   run: docker logs testmodel > /tmp/docker-${{ matrix.backend }}.log
+      - name: save logs
+        if: always()
+        run: docker logs custommodel > /tmp/docker.log
 
-      # - run: docker stop testmodel
-      #   if: always()
+      - run: docker stop custommodel
+        if: always()
 
-      # - run: docker system prune -a -f --volumes
-      #   if: always()
+      - run: docker system prune -a -f --volumes
+        if: always()
 
-      # - name: publish test artifacts
-      #   if: always()
-      #   uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
-      #   with:
-      #     name: test-${{ matrix.backend }}
-      #     path: |
-      #       /tmp/*.log
+      - name: publish test artifacts
+        if: always()
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: test
+          path: |
+            /tmp/*.log
