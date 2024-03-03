@@ -71,7 +71,7 @@ jobs:
       - run: docker system prune -a -f --volumes
         if: always()
 
-      - run: clean up output
+      - name: clean up output
         if: always()
         run: rm -rf _output
 
