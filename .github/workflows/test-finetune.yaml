@@ -9,12 +9,20 @@ jobs:
   test:
     runs-on: self-hosted
     timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        targets:
+          - unsloth
     steps:
       - name: cleanup workspace
         run: |
           rm -rf ./* || true
           rm -rf ./.??* || true
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - run: nvidia-smi
 
         # use default docker driver builder with containerd image store for local aikit image
         # must have insecure security entitlement for finetuning
@@ -25,21 +33,23 @@ jobs:
         run: |
           docker build . -t aikit:test \
             --load --provenance=false --progress plain
-
+    
       - name: build finetuned model
         run: |
           docker build --allow security.insecure \
-            --file test/aikitfile-unsloth.yaml --output _output \
-            --target unsloth --progress plain .
+            --file test/aikitfile-${{ matrix.targets }}.yaml --output _output \
+            --target ${{ matrix.targets }} --progress plain .
 
       - name: check if finetuned model exists
-        run: test -f _output/model-q4_k_m.gguf
+        run: |
+          ls -al _output
+          test -f _output/model-q4_k_m.gguf
       
       - name: build custom model
         working-directory: _output
         run: |
           docker build . -t custommodel:test \
-            -f test/aikitfile-unsloth-custom.yaml \
+            -f test/aikitfile-${{ matrix.targets }}-custom.yaml \
             --load --provenance=false --progress plain
 
       - name: list images
