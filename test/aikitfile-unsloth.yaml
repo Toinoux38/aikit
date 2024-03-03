@@ -7,7 +7,7 @@ datasets:
 config:
   unsloth:
     # TODO: add validations
-    packing: False
+    packing: false
     maxSeqLength: 2048
     loadIn4bit: true
     batchSize: 2
