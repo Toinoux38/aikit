@@ -32,7 +32,6 @@ const sidebars = {
       items: [
         'create-images',
         'fine-tune',
-        'specs',
         'vision',
         'gpu',
         'kubernetes',
@@ -41,7 +40,16 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Supported Backends',
+      label: 'Specifications',
+      collapsed: false,
+      items: [
+        'specs-inference',
+        'specs-finetune',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Inference Supported Backends',
       collapsed: false,
       items: [
         'llama-cpp',

@@ -1,8 +1,6 @@
 ---
-title: API Specifications
+title: Inference API Specifications
 ---
-
-# Inference
 
 ## v1alpha1
 
@@ -62,22 +60,4 @@ config: |
     template:
       chat_message: \"llama-2-7b-chat\"
     system_prompt: \"You are a helpful assistant, below is a conversation, please respond with the next message and do not ask follow-up questions\"
-```
-
-# Fine Tuning
-
-TODO: add specs
-
-
-## v1alpha1
-
-```yaml
-
-```
-
-Example:
-
-```yaml
-#syntax=ghcr.io/sozercan/aikit:latest
-
 ```

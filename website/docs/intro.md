@@ -14,7 +14,7 @@ TODO: something about fine tuning
 - 🐳 No GPU, Internet access or additional tools needed except for [Docker](https://docs.docker.com/desktop/install/linux-install/)!
 - 🤏 Minimal image size, resulting in less vulnerabilities and smaller attack surface with a custom [distroless](https://github.com/GoogleContainerTools/distroless)-based image
 - 🎵 [Fine tune support](fine-tune.md)
-- 🚀 [Easy to use declarative configuration](specs.md)
+- 🚀 Easy to use declarative configuration for [inference](specs-inference.md) and [fine tuning](specs-finetune.md)
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
 - 📸 [Multi-modal model support](vision.md)
 - 🖼️ Image generation support with Stable Diffusion

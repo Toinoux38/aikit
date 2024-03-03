@@ -58,7 +58,7 @@ AIKit is capable of supporting multiple fine tuning implementation targets.
 
 At this time, [unsloth](https://github.com/unslothai/unsloth) is the only supported target, but future support for [axolotl](https://github.com/OpenAccess-AI-Collective/axolotl) is planned.
 
-Please refer to [API Specifications](./specs.md) for more information.
+Please refer to [Fine Tuning API Specifications](./specs-finetune.md) for more information.
 
 ### Unsloth
 
