@@ -2,6 +2,7 @@ package inference
 
 import (
 	"fmt"
+	"net/url"
 	"path"
 	"strings"
 
@@ -60,30 +61,43 @@ func getBaseImage(c *config.InferenceConfig) llb.State {
 func copyModels(c *config.InferenceConfig, base llb.State, s llb.State) (llb.State, llb.State) {
 	savedState := s
 	for _, model := range c.Models {
-		var opts []llb.HTTPOption
-		opts = append(opts, llb.Filename(utils.FileNameFromURL(model.Source)))
-		if model.SHA256 != "" {
-			digest := digest.NewDigestFromEncoded(digest.SHA256, model.SHA256)
-			opts = append(opts, llb.Checksum(digest))
-		}
+		// check if model source is a URL or a local path
+		_, err := url.ParseRequestURI(model.Source)
+		if err == nil {
+			var opts []llb.HTTPOption
+			opts = append(opts, llb.Filename(utils.FileNameFromURL(model.Source)))
+			if model.SHA256 != "" {
+				digest := digest.NewDigestFromEncoded(digest.SHA256, model.SHA256)
+				opts = append(opts, llb.Checksum(digest))
+			}
 
-		m := llb.HTTP(model.Source, opts...)
+			m := llb.HTTP(model.Source, opts...)
 
-		var modelPath string
-		if strings.Contains(model.Name, "/") {
-			modelPath = "/models/" + path.Dir(model.Name) + "/" + utils.FileNameFromURL(model.Source)
+			var modelPath string
+			if strings.Contains(model.Name, "/") {
+				modelPath = "/models/" + path.Dir(model.Name) + "/" + utils.FileNameFromURL(model.Source)
+			} else {
+				modelPath = "/models/" + utils.FileNameFromURL(model.Source)
+			}
+
+			var copyOpts []llb.CopyOption
+			copyOpts = append(copyOpts, &llb.CopyInfo{
+				CreateDestPath: true,
+			})
+			s = s.File(
+				llb.Copy(m, utils.FileNameFromURL(model.Source), modelPath, copyOpts...),
+				llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+modelPath), //nolint: goconst
+			)
 		} else {
-			modelPath = "/models/" + utils.FileNameFromURL(model.Source)
+			var copyOpts []llb.CopyOption
+			copyOpts = append(copyOpts, &llb.CopyInfo{
+				CreateDestPath: true,
+			})
+			s = s.File(
+				llb.Copy(llb.Local("context"), model.Source, "/models/", copyOpts...),
+				llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+"/models"), //nolint: goconst
+			)
 		}
-
-		var copyOpts []llb.CopyOption
-		copyOpts = append(copyOpts, &llb.CopyInfo{
-			CreateDestPath: true,
-		})
-		s = s.File(
-			llb.Copy(m, utils.FileNameFromURL(model.Source), modelPath, copyOpts...),
-			llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+modelPath), //nolint: goconst
-		)
 
 		// create prompt templates if defined
 		for _, pt := range model.PromptTemplates {

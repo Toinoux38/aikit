@@ -4,7 +4,7 @@ debug: true
 runtime: cuda
 models:
   - name: custom
-    source: https://huggingface.co/sozercan/test/resolve/main/model-q8_0.gguf
+    source: model-q8_0.gguf
 config: |
   - name: custom
     backend: llama
