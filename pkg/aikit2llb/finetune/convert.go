@@ -61,7 +61,7 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 		state = state.Run(utils.Shf("pip install 'unsloth[cu121_ampere] @ git+https://github.com/unslothai/unsloth.git@%[1]s' --break-system-packages", unslothCommitSHA)).Root()
 
 		// TODO: replace the branch with a release tag and have it update with a release
-		unslothScriptURL := "https://raw.githubusercontent.com/sozercan/aikit/finetune/pkg/finetune/provider_unsloth.py"
+		unslothScriptURL := "https://raw.githubusercontent.com/sozercan/aikit/finetune/pkg/finetune/target_unsloth.py"
 		var opts []llb.HTTPOption
 		opts = append(opts, llb.Chmod(0o755))
 		unslothScript := llb.HTTP(unslothScriptURL, opts...)
@@ -72,7 +72,7 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 
 		// setup nvidia devices and run unsloth
 		// due to buildkit run limitations, we need to create the devices manually and run unsloth in the same command
-		state = state.Run(utils.Shf("%[1]s && /provider_unsloth.py", nvidiaMknod), llb.Security(llb.SecurityModeInsecure)).Root()
+		state = state.Run(utils.Shf("%[1]s && /target_unsloth.py", nvidiaMknod), llb.Security(llb.SecurityModeInsecure)).Root()
 
 		// copy gguf to scratch which will be the output
 		const inputFile = "*.gguf"
