@@ -16,10 +16,7 @@ with open('config.yaml', 'r') as config_file:
         print(exc)
 
 cfg = data.get('config').get('unsloth')
-
 max_seq_length = cfg.get('maxSeqLength')
-url = data.get('datasets')[0]['source']
-dataset = load_dataset("json", data_files={"train": url}, split="train")
 
 model, tokenizer = FastLanguageModel.from_pretrained(
     model_name=data.get('baseModel'),
@@ -40,6 +37,36 @@ model = FastLanguageModel.get_peft_model(
     random_state=3407,
     max_seq_length=max_seq_length,
 )
+
+# TODO: use the dataset type here
+alpaca_prompt = """Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
+
+### Instruction:
+{}
+
+### Input:
+{}
+
+### Response:
+{}"""
+
+EOS_TOKEN = tokenizer.eos_token
+def formatting_prompts_func(examples):
+    instructions = examples["instruction"]
+    inputs       = examples["input"]
+    outputs      = examples["output"]
+    texts = []
+    for instruction, input, output in zip(instructions, inputs, outputs):
+        # Must add EOS_TOKEN, otherwise your generation will go on forever!
+        text = alpaca_prompt.format(instruction, input, output) + EOS_TOKEN
+        texts.append(text)
+    return { "text" : texts, }
+pass
+
+from datasets import load_dataset
+source = data.get('datasets')[0]['source']
+dataset = load_dataset(source, split = "train")
+dataset = dataset.map(formatting_prompts_func, batched = True)
 
 trainer = SFTTrainer(
     model=model,
