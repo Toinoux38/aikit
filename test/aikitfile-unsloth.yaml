@@ -1,4 +1,4 @@
-#syntax=sozercan/aikit:test
+#syntax=aikit:test
 apiVersion: v1alpha1
 baseModel: unsloth/gemma-2b-it-bnb-4bit
 datasets:
