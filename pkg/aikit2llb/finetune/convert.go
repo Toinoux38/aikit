@@ -18,7 +18,7 @@ const (
 )
 
 func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
-	imageCfg := NewImageConfig(c)
+	imageCfg := NewImageConfig()
 
 	env := map[string]string{
 		"PATH":                       system.DefaultPathEnv("linux") + ":/usr/local/cuda/bin",

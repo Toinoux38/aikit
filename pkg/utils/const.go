@@ -11,7 +11,11 @@ const (
 	BackendExllamaV2       = "exllama2"
 	BackendMamba           = "mamba"
 
+	TargetUnsloth = "unsloth"
+
+	DatasetAlpaca = "alpaca"
+
 	APIv1alpha1 = "v1alpha1"
 
-	DebianSlim     = "docker.io/library/debian:12-slim"
+	DebianSlim = "docker.io/library/debian:12-slim"
 )

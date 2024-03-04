@@ -1,6 +1,7 @@
 package build
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/sozercan/aikit/pkg/aikit/config"
@@ -118,8 +119,126 @@ func Test_validateConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validateConfig(tt.args.c); (err != nil) != tt.wantErr {
+			if err := validateInferenceConfig(tt.args.c); (err != nil) != tt.wantErr {
 				t.Errorf("validateConfig() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_validateFineTuneConfig(t *testing.T) {
+	type args struct {
+		c *config.FineTuneConfig
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "no config",
+			args:    args{c: &config.FineTuneConfig{}},
+			wantErr: true,
+		},
+		{
+			name: "unsupported api version",
+			args: args{c: &config.FineTuneConfig{
+				APIVersion: "v10",
+			}},
+			wantErr: true,
+		},
+		{
+			name: "invalid target",
+			args: args{c: &config.FineTuneConfig{
+				APIVersion: "v1alpha1",
+				Target:     "foo",
+			}},
+			wantErr: true,
+		},
+		{
+			name: "no datasets",
+			args: args{c: &config.FineTuneConfig{
+				APIVersion: "v1alpha1",
+				Target:     "unsloth",
+			}},
+			wantErr: true,
+		},
+		{
+			name: "invalid dataset type",
+			args: args{c: &config.FineTuneConfig{
+				APIVersion: "v1alpha1",
+				Target:     "unsloth",
+				Datasets: []config.Dataset{
+					{
+						Source: "foo",
+						Type:   "bar",
+					},
+				},
+			}},
+			wantErr: true,
+		},
+		{
+			name: "valid dataset type",
+			args: args{c: &config.FineTuneConfig{
+				APIVersion: "v1alpha1",
+				Target:     "unsloth",
+				Datasets: []config.Dataset{
+					{
+						Source: "foo",
+						Type:   "alpaca",
+					},
+				},
+			}},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := validateFinetuneConfig(tt.args.c); (err != nil) != tt.wantErr {
+				t.Errorf("validateFineTuneConfig() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_defaultsUnslothConfig(t *testing.T) {
+	type args struct {
+		c *config.FineTuneConfig
+	}
+	tests := []struct {
+		name string
+		args args
+		want *config.FineTuneConfig
+	}{
+		{
+			name: "no config",
+			args: args{c: &config.FineTuneConfig{}},
+			want: &config.FineTuneConfig{
+				Config: config.FineTuneConfigSpec{
+					Unsloth: config.FineTuneConfigUnslothSpec{
+						Packing:                   false,
+						MaxSeqLength:              2048,
+						LoadIn4bit:                false,
+						BatchSize:                 2,
+						GradientAccumulationSteps: 4,
+						WarmupSteps:               10,
+						MaxSteps:                  60,
+						LearningRate:              0.0002,
+						LoggingSteps:              1,
+						Optimizer:                 "adamw_8bit",
+						WeightDecay:               0.01,
+						LrSchedulerType:           "linear",
+						Seed:                      42,
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defaultsUnslothConfig(tt.args.c)
+			if !reflect.DeepEqual(tt.args.c, tt.want) {
+				t.Errorf("defaultsUnslothConfig() = %v, want %v", tt.args.c, tt.want)
 			}
 		})
 	}

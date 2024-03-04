@@ -45,6 +45,11 @@ func buildFineTune(ctx context.Context, c client.Client, cfg *config.FineTuneCon
 		return nil, errors.Wrap(err, "validating aikitfile")
 	}
 
+	// set defaults for unsloth config
+	if cfg.Target == utils.TargetUnsloth {
+		cfg = defaultsUnslothConfig(cfg)
+	}
+
 	st, img := finetune.Aikit2LLB(cfg)
 
 	def, err := st.Marshal(ctx)
@@ -75,7 +80,7 @@ func buildFineTune(ctx context.Context, c client.Client, cfg *config.FineTuneCon
 }
 
 func buildInference(ctx context.Context, c client.Client, cfg *config.InferenceConfig) (*client.Result, error) {
-	err := validateConfig(cfg)
+	err := validateInferenceConfig(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "validating aikitfile")
 	}
@@ -168,14 +173,73 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Inference
 	return inferenceCfg, finetuneCfg, nil
 }
 
+var supportedFineTuneTargets = []string{"unsloth"}
+
 func validateFinetuneConfig(c *config.FineTuneConfig) error {
 	if c.APIVersion == "" {
 		return errors.New("apiVersion is not defined")
 	}
+
+	if c.APIVersion != utils.APIv1alpha1 {
+		return errors.Errorf("apiVersion %s is not supported", c.APIVersion)
+	}
+
+	if !slices.Contains(supportedFineTuneTargets, c.Target) {
+		return errors.Errorf("target %s is not supported", c.Target)
+	}
+
+	if len(c.Datasets) == 0 {
+		return errors.New("no datasets defined")
+	}
+
+	// only alpaca dataset is supported at this time
+	for _, d := range c.Datasets {
+		if d.Type != utils.DatasetAlpaca {
+			return errors.Errorf("dataset type %s is not supported", d.Type)
+		}
+	}
+
 	return nil
 }
 
-func validateConfig(c *config.InferenceConfig) error {
+func defaultsUnslothConfig(c *config.FineTuneConfig) *config.FineTuneConfig {
+	if c.Config.Unsloth.MaxSeqLength == 0 {
+		c.Config.Unsloth.MaxSeqLength = 2048
+	}
+	if c.Config.Unsloth.BatchSize == 0 {
+		c.Config.Unsloth.BatchSize = 2
+	}
+	if c.Config.Unsloth.GradientAccumulationSteps == 0 {
+		c.Config.Unsloth.GradientAccumulationSteps = 4
+	}
+	if c.Config.Unsloth.WarmupSteps == 0 {
+		c.Config.Unsloth.WarmupSteps = 10
+	}
+	if c.Config.Unsloth.MaxSteps == 0 {
+		c.Config.Unsloth.MaxSteps = 60
+	}
+	if c.Config.Unsloth.LearningRate == 0 {
+		c.Config.Unsloth.LearningRate = 0.0002
+	}
+	if c.Config.Unsloth.LoggingSteps == 0 {
+		c.Config.Unsloth.LoggingSteps = 1
+	}
+	if c.Config.Unsloth.Optimizer == "" {
+		c.Config.Unsloth.Optimizer = "adamw_8bit"
+	}
+	if c.Config.Unsloth.WeightDecay == 0 {
+		c.Config.Unsloth.WeightDecay = 0.01
+	}
+	if c.Config.Unsloth.LrSchedulerType == "" {
+		c.Config.Unsloth.LrSchedulerType = "linear"
+	}
+	if c.Config.Unsloth.Seed == 0 {
+		c.Config.Unsloth.Seed = 42
+	}
+	return c
+}
+
+func validateInferenceConfig(c *config.InferenceConfig) error {
 	if c.APIVersion == "" {
 		return errors.New("apiVersion is not defined")
 	}

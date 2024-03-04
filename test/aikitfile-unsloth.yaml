@@ -4,10 +4,8 @@ baseModel: unsloth/mistral-7b-instruct-v0.2-bnb-4bit
 datasets:
   - source: "yahma/alpaca-cleaned"
     type: alpaca
-    # TODO: figure out type
 config:
   unsloth:
-    # TODO: add validations
     packing: false
     maxSeqLength: 2048
     loadIn4bit: true
