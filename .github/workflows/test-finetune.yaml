@@ -46,10 +46,9 @@ jobs:
           test -f _output/model-q4_k_m.gguf
       
       - name: build custom model
-        working-directory: _output
         run: |
-          docker build . -t custommodel:test \
-            -f test/aikitfile-${{ matrix.targets }}-custom.yaml \
+          docker build _output --tag custommodel:test \
+            --file test/aikitfile-${{ matrix.targets }}-custom.yaml \
             --load --provenance=false --progress plain
 
       - name: list images
