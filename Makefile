@@ -8,7 +8,7 @@ TEST_FILE ?= test/aikitfile-llama.yaml
 
 GIT_COMMIT := $(shell git rev-list --abbrev-commit --tags --max-count=1)
 GIT_TAG := $(shell git describe --abbrev=0 --tags ${GIT_COMMIT} 2>/dev/null || true)
-LDFLAGS := "-X github.com/sozercan/aikit/pkg/version.Version=$(GIT_TAG:v%=%)"
+LDFLAGS := "-X github.com/sozercan/aikit/pkg/version.Version=$(GIT_TAG:%=%)"
 
 .PHONY: lint
 lint:
