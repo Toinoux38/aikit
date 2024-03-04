@@ -6,13 +6,18 @@ OUTPUT_TYPE ?= type=docker
 TEST_IMAGE_NAME ?= testmodel
 TEST_FILE ?= test/aikitfile-llama.yaml
 
+TAG_COMMIT := $(shell git rev-list --abbrev-commit --tags --max-count=1)
+TAG := $(shell git describe --abbrev=0 --tags ${TAG_COMMIT} 2>/dev/null || true)
+VERSION := $(TAG:v%=%)
+LDFLAGS := "-X github.com/sozercan/aikit/pkg/version.Version=$(VERSION)"
+
 .PHONY: lint
 lint:
 	golangci-lint run -v ./... --timeout 5m
 
 .PHONY: build-aikit
 build-aikit:
-	docker buildx build . -t ${REGISTRY}/aikit:${TAG} --output=${OUTPUT_TYPE}
+	docker buildx build . -t ${REGISTRY}/aikit:${TAG} --output=${OUTPUT_TYPE} --build-arg LDFLAGS=${LDFLAGS}
 
 .PHONY: build-test-model
 build-test-model:

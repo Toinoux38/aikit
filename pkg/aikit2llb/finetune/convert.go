@@ -8,6 +8,7 @@ import (
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/sozercan/aikit/pkg/aikit/config"
 	"github.com/sozercan/aikit/pkg/utils"
+	"github.com/sozercan/aikit/pkg/version"
 	"gopkg.in/yaml.v2"
 )
 
@@ -61,7 +62,9 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 		state = state.Run(utils.Shf("pip install 'unsloth[cu121_ampere] @ git+https://github.com/unslothai/unsloth.git@%[1]s' --break-system-packages", unslothCommitSHA)).Root()
 
 		// TODO: replace the branch with a release tag and have it update with a release
-		unslothScriptURL := "https://raw.githubusercontent.com/sozercan/aikit/finetune/pkg/finetune/target_unsloth.py"
+		version := version.Version
+		unslothScriptURL := fmt.Sprintf("https://raw.githubusercontent.com/sozercan/aikit/%s/pkg/finetune/target_unsloth.py", version)
+		// unslothScriptURL := "https://raw.githubusercontent.com/sozercan/aikit/finetune/pkg/finetune/target_unsloth.py"
 		var opts []llb.HTTPOption
 		opts = append(opts, llb.Chmod(0o755))
 		unslothScript := llb.HTTP(unslothScriptURL, opts...)
