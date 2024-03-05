@@ -11,7 +11,7 @@ import yaml
 with open('config.yaml', 'r') as config_file:
     try:
         data = yaml.safe_load(config_file)
-        print(data)   # TODO: remove this
+        print(data)
     except yaml.YAMLError as exc:
         print(exc)
 
