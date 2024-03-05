@@ -193,13 +193,16 @@ func validateFinetuneConfig(c *config.FineTuneConfig) error {
 		return errors.New("no datasets defined")
 	}
 
+	if len(c.Datasets) > 1 {
+		return errors.New("only one dataset is supported at this time")
+	}
+
 	// only alpaca dataset is supported at this time
 	for _, d := range c.Datasets {
 		if d.Type != utils.DatasetAlpaca {
 			return errors.Errorf("dataset type %s is not supported", d.Type)
 		}
 	}
-
 	return nil
 }
 

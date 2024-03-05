@@ -191,6 +191,24 @@ func Test_validateFineTuneConfig(t *testing.T) {
 			}},
 			wantErr: false,
 		},
+		{
+			name: "multiple datasets",
+			args: args{c: &config.FineTuneConfig{
+				APIVersion: "v1alpha1",
+				Target:     "unsloth",
+				Datasets: []config.Dataset{
+					{
+						Source: "foo",
+						Type:   "alpaca",
+					},
+					{
+						Source: "bar",
+						Type:   "alpaca",
+					},
+				},
+			}},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
