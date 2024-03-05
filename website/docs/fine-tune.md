@@ -62,15 +62,15 @@ Please refer to [Fine Tuning API Specifications](./specs-finetune.md) for more i
 
 ### Unsloth
 
-Create a YAML file with your configuration. For example, a basic config looks like:
+Create a YAML file with your configuration. For example, minimum config looks like:
 
 ```yaml
 #syntax=sozercan/aikit:test
 apiVersion: v1alpha1
-baseModel: unsloth/llama-2-7b-bnb-4bit
+baseModel: unsloth/llama-2-7b-bnb-4bit # base model to be fine tuned. can be any model from huggingface. for unsloth optimized base models, see https://huggingface.co/unsloth
 datasets:
-  - source: "yahma/alpaca-cleaned"
-    type: alpaca
+  - source: "yahma/alpaca-cleaned" # data set to be used for fine tuning.
+    type: alpaca # type of dataset. only alpaca is supported at this time.
 ```
 
 For full configuration, please refer to [Fine Tune Specifications](./specs-finetune.md)
@@ -93,7 +93,7 @@ If you are using containerd image store option, you can build with `docker build
 
 Depending on your setup and configuration, build process may take some time. At the end of the build, the fine-tuned model will automatically be quantized with the specified format and output to the path specified in the `--output`.
 
-Output will be a `GGUF` file with the name and quanization format from the configuration. For example:
+Output will be a `GGUF` model file with the name and quanization format from the configuration. For example:
 
 ```bash
 $ ls -al _output
