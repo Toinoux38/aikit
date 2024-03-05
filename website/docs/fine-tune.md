@@ -7,11 +7,11 @@ Fine tuning process allows the adaptation of pre-trained models to domain-specif
 :::note
 Due to current BuildKit and NVIDIA limitations, your host GPU driver version must match the driver that AIKit will install into the container during build. 
 
-To find your host GPU driver, you can run `nvidia-smi` or `cat /proc/driver/nvidia/version`
+To find your host GPU driver version, you can run `nvidia-smi` or `cat /proc/driver/nvidia/version`
 
-For a list of supported drivers for AIKit, please refer to https://download.nvidia.com/XFree86/Linux-x86_64/
+For a list of supported driver versions for AIKit, please refer to https://download.nvidia.com/XFree86/Linux-x86_64/
 
-If you don't see your host GPU driver version in that list, you'll need to install one from the list.
+If you don't see your host GPU driver version in that list, you'll need to install one that's matching the version in that list. You don't need to install drivers from that location, only the versions need to match.
 
 This might be further optimizated in the future to remove this requirement, if possible.
 :::
@@ -73,7 +73,7 @@ datasets:
     type: alpaca # type of dataset. only alpaca is supported at this time.
 ```
 
-For full configuration, please refer to [Fine Tune Specifications](./specs-finetune.md)
+For full configuration, please refer to [Fine Tune API Specifications](./specs-finetune.md)
 
 :::note
 Please refer to [unsloth documentation](https://github.com/unslothai/unsloth) for more information about the configuration.
