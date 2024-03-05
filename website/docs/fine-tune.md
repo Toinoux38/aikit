@@ -18,39 +18,13 @@ This might be further optimizated in the future to remove this requirement, if p
 
 ## Getting Started
 
-To get started, you need to create a builder to be able to access host GPU devices. There are two ways you can get started:
-
-### `docker-container` driver
+To get started, you need to create a builder to be able to access host GPU devices.
 
 Create a builder with the following configuration:
 
 ```bash
 docker buildx create --name aikit-builder --use --buildkitd-flags '--allow-insecure-entitlement security.insecure'
 ```
-
-### `docker` driver with containerd image store
-
-:::note
-Containerd image store requires Docker v24 and later.
-:::
-
-You can enable [containerd image store](https://docs.docker.com/storage/containerd/) and required security entitlements for GPU device access by editing `/etc/docker/daemon.json` to add the following configuration:
-
-```json
-{
-  ...
-    "features": {
-        "containerd-snapshotter": true
-    },
-    "builder": {
-        "entitlements": {
-            "security-insecure": true
-        }
-    }
-}
-```
-
-After editing `/etc/docker/daemon.json`, restart the service with `sudo systemctl restart docker`. 
 
 ## Targets and Configuration
 
@@ -82,10 +56,6 @@ Build using following command and make sure to replace `--target` with the fine-
 ```bash
 docker buildx build --builder aikit-builder --allow security.insecure --file "/path/to/config.yaml" --output "/path/to/output" --target unsloth --progress plain .
 ```
-
-:::tip
-If you are using containerd image store option, you can build with `docker build` which will default to the `default` `docker` driver builder.
-:::
 
 Depending on your setup and configuration, build process may take some time. At the end of the build, the fine-tuned model will automatically be quantized with the specified format and output to the path specified in the `--output`.
 
