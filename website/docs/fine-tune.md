@@ -54,18 +54,14 @@ After editing `/etc/docker/daemon.json`, restart the service with `sudo systemct
 
 ## Targets and Configuration
 
-AIKit is capable of supporting multiple fine tuning implementation targets. 
-
-At this time, [unsloth](https://github.com/unslothai/unsloth) is the only supported target, but future support for [axolotl](https://github.com/OpenAccess-AI-Collective/axolotl) is planned.
-
-Please refer to [Fine Tuning API Specifications](./specs-finetune.md) for more information.
+AIKit is capable of supporting multiple fine tuning implementation targets. At this time, [Unsloth](https://github.com/unslothai/unsloth) is the only supported target, but can be extended for other fine tuning implementations in the future.
 
 ### Unsloth
 
 Create a YAML file with your configuration. For example, minimum config looks like:
 
 ```yaml
-#syntax=sozercan/aikit:test
+#syntax=ghcr.io/sozercan/aikit:latest
 apiVersion: v1alpha1
 baseModel: unsloth/llama-2-7b-bnb-4bit # base model to be fine tuned. can be any model from huggingface. for unsloth optimized base models, see https://huggingface.co/unsloth
 datasets:
