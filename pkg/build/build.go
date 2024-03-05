@@ -45,10 +45,11 @@ func buildFineTune(ctx context.Context, c client.Client, cfg *config.FineTuneCon
 		return nil, errors.Wrap(err, "validating aikitfile")
 	}
 
-	// set defaults for unsloth config
+	// set defaults for unsloth and finetune config
 	if cfg.Target == utils.TargetUnsloth {
 		cfg = defaultsUnslothConfig(cfg)
 	}
+	cfg = defaultsFineTune(cfg)
 
 	st, img := finetune.Aikit2LLB(cfg)
 
@@ -235,6 +236,16 @@ func defaultsUnslothConfig(c *config.FineTuneConfig) *config.FineTuneConfig {
 	}
 	if c.Config.Unsloth.Seed == 0 {
 		c.Config.Unsloth.Seed = 42
+	}
+	return c
+}
+
+func defaultsFineTune(c *config.FineTuneConfig) *config.FineTuneConfig {
+	if c.Output.Quantize == "" {
+		c.Output.Quantize = "q4_k_m"
+	}
+	if c.Output.Name == "" {
+		c.Output.Name = "aikit-model"
 	}
 	return c
 }

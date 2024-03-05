@@ -62,34 +62,18 @@ Please refer to [Fine Tuning API Specifications](./specs-finetune.md) for more i
 
 ### Unsloth
 
-Create a YAML file with your configuration. For example:
+Create a YAML file with your configuration. For example, a basic config looks like:
 
 ```yaml
 #syntax=sozercan/aikit:test
 apiVersion: v1alpha1
 baseModel: unsloth/llama-2-7b-bnb-4bit
 datasets:
-  - source: "https://huggingface.co/datasets/laion/OIG/resolve/main/unified_chip2.jsonl"
+  - source: "yahma/alpaca-cleaned"
     type: alpaca
-config:
-  unsloth:
-    packing: false
-    maxSeqLength: 2048
-    loadIn4bit: true
-    batchSize: 2
-    gradientAccumulationSteps: 4
-    warmupSteps: 10
-    maxSteps: 60
-    learningRate: 0.0002
-    loggingSteps: 1
-    optimizer: adamw_8bit
-    weightDecay: 0.01
-    lrSchedulerType: linear
-    seed: 42
-output:
-  name: model
-  quantize: q8_0
 ```
+
+For full configuration, please refer to [Fine Tune Specifications](./specs-finetune.md)
 
 :::note
 Please refer to [unsloth documentation](https://github.com/unslothai/unsloth) for more information about the configuration.
@@ -113,7 +97,7 @@ Output will be a `GGUF` file with the name and quanization format from the confi
 
 ```bash
 $ ls -al _output
--rw-r--r--  1 sozercan sozercan 7161089856 Mar  3 00:19 model-q8_0.gguf
+-rw-r--r--  1 sozercan sozercan 7161089856 Mar  3 00:19 aikit-model-q4_k_m.gguf
 ```
 
 ## What's next?
