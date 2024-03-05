@@ -7,9 +7,9 @@ title: Fine Tuning API Specifications
 ```yaml
 #syntax=ghcr.io/sozercan/aikit:latest
 apiVersion: # required. only v1alpha1 is supported at the moment
-baseModel: # required. any base model from huggingface. for unsloth, see for 4bit pre-quantized models: https://huggingface.co/unsloth
+baseModel: # required. any base model from Huggingface. for unsloth, see for 4bit pre-quantized models: https://huggingface.co/unsloth
 datasets:
-  - source: # required. this can be a huggingface dataset repo or a URL
+  - source: # required. this can be a Huggingface dataset repo or a URL pointing to a JSON file
     type: # required. can be "alpaca". only alpaca is supported at the moment
 config:
   unsloth:
