@@ -72,7 +72,7 @@ datasets:
 For full configuration, please refer to [Fine Tune API Specifications](./specs-finetune.md)
 
 :::note
-Please refer to [unsloth documentation](https://github.com/unslothai/unsloth) for more information about the configuration.
+Please refer to [Unsloth documentation](https://github.com/unslothai/unsloth) for more information about Unsloth configuration.
 :::
 
 ## Build
@@ -98,4 +98,4 @@ $ ls -al _output
 
 ## What's next?
 
-Now that you have a fine-tuned model output as a GGUF file, you can refer to [Creating Model Images](./create-images.md) on how to create an image with AIKit to serve your fine-tuned model!
+👉 Now that you have a fine-tuned model output as a GGUF file, you can refer to [Creating Model Images](./create-images.md) on how to create an image with AIKit to serve your fine-tuned model!
