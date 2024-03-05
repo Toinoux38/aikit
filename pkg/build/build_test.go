@@ -251,6 +251,47 @@ func Test_defaultsUnslothConfig(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "with config",
+			args: args{c: &config.FineTuneConfig{
+				Config: config.FineTuneConfigSpec{
+					Unsloth: config.FineTuneConfigUnslothSpec{
+						Packing:                   true,
+						MaxSeqLength:              1024,
+						LoadIn4bit:                true,
+						BatchSize:                 4,
+						GradientAccumulationSteps: 8,
+						WarmupSteps:               20,
+						MaxSteps:                  120,
+						LearningRate:              0.0004,
+						LoggingSteps:              2,
+						Optimizer:                 "adamw_16bit",
+						WeightDecay:               0.02,
+						LrSchedulerType:           "cosine",
+						Seed:                      24,
+					},
+				},
+			}},
+			want: &config.FineTuneConfig{
+				Config: config.FineTuneConfigSpec{
+					Unsloth: config.FineTuneConfigUnslothSpec{
+						Packing:                   true,
+						MaxSeqLength:              1024,
+						LoadIn4bit:                true,
+						BatchSize:                 4,
+						GradientAccumulationSteps: 8,
+						WarmupSteps:               20,
+						MaxSteps:                  120,
+						LearningRate:              0.0004,
+						LoggingSteps:              2,
+						Optimizer:                 "adamw_16bit",
+						WeightDecay:               0.02,
+						LrSchedulerType:           "cosine",
+						Seed:                      24,
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
