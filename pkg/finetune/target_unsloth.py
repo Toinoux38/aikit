@@ -66,7 +66,12 @@ pass
 
 from datasets import load_dataset
 source = data.get('datasets')[0]['source']
-dataset = load_dataset(source, split = "train")
+
+if source.startswith('http'):
+    dataset = load_dataset("json", data_files={"train": source}, split="train")
+else:
+    dataset = load_dataset(source, split = "train")
+
 dataset = dataset.map(formatting_prompts_func, batched = True)
 
 trainer = SFTTrainer(

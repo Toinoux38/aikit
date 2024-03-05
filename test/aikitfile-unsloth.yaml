@@ -2,7 +2,7 @@
 apiVersion: v1alpha1
 baseModel: unsloth/mistral-7b-instruct-v0.2-bnb-4bit
 datasets:
-  - source: "yahma/alpaca-cleaned"
+  - source: "https://huggingface.co/datasets/yahma/alpaca-cleaned/resolve/main/alpaca_data_cleaned.json"
     type: alpaca
 config:
   unsloth:
