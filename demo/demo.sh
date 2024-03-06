@@ -78,15 +78,15 @@ DEMO_PROMPT="${GREEN}➜  ${COLOR_RESET}"
 
 # echo ""
 
-echo "🏃 We have finished building the minimal container. Let's start the container and test it."
+# echo "🏃 We have finished building the minimal container. Let's start the container and test it."
 
-pei "docker run --name llama-2-finetuned -d --rm -p 8080:8080 llama-finetuned"
+# pei "docker run --name llama-2-finetuned -d --rm -p 8080:8080 llama-finetuned"
 
-echo ""
+# echo ""
 
-echo "🧪 We can now test the container using a sample query. Since this is OpenAI API compatible, you can use it as a drop-in replacement for any application that uses OpenAI API."
+# echo "🧪 We can now test the container using a sample query. Since this is OpenAI API compatible, you can use it as a drop-in replacement for any application that uses OpenAI API."
 
-echo ""
+# echo ""
 
 pei "curl http://localhost:8080/v1/chat/completions -H \"Content-Type: application/json\" -d '{\"model\": \"llama-2-finetuned\", \"messages\": [{\"role\": \"user\", \"content\": \"Compose a haiku about cats\"}]}"
 
