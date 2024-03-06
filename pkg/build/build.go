@@ -53,7 +53,7 @@ func buildFineTune(ctx context.Context, c client.Client, cfg *config.FineTuneCon
 	}
 	cfg = defaultsFineTune(cfg)
 
-	st, img := finetune.Aikit2LLB(cfg)
+	st := finetune.Aikit2LLB(cfg)
 
 	def, err := st.Marshal(ctx)
 	if err != nil {
@@ -65,20 +65,6 @@ func buildFineTune(ctx context.Context, c client.Client, cfg *config.FineTuneCon
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to resolve dockerfile")
 	}
-	ref, err := res.SingleRef()
-	if err != nil {
-		return nil, err
-	}
-
-	config, err := json.Marshal(img)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to marshal image config")
-	}
-	k := platforms.Format(platforms.DefaultSpec())
-
-	res.AddMeta(fmt.Sprintf("%s/%s", exptypes.ExporterImageConfigKey, k), config)
-	res.SetRef(ref)
-
 	return res, nil
 }
 
