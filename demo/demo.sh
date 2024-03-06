@@ -9,7 +9,7 @@ echo "In this demo, we are going to start by fine tuning a model and then deploy
 
 echo "First, we are going to create a new builder"
 
-pei docker buildx create --name aikit-builder --use --buildkitd-flags '--allow-insecure-entitlement security.insecure'
+pei "docker buildx create --name aikit-builder --use --buildkitd-flags '--allow-insecure-entitlement security.insecure'"
 
 echo "Create a configuration for the fine tuning. We are going to be using a LLama 2 model and fine tune using yahma/alpaca-cleaned dataset."
 
