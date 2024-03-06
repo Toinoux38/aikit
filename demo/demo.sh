@@ -88,7 +88,7 @@ echo "🧪 We can now test the container using a sample query. Since this is Ope
 
 echo ""
 
-pei "curl http://localhost:8080/v1/chat/completions -H 'Content-Type: application/json' -d \"{'model': 'llama-2-finetuned', 'messages': [{'role': 'user', 'content': 'Compose a haiku about cats'}]}\""
+pei "curl http://localhost:8080/v1/chat/completions -H \"Content-Type: application/json\" -d '{\"model\": \"llama-2-finetuned\", \"messages\": [{\"role\": \"user\", \"content\": \"Compose a haiku about cats\"}]}"
 
 # echo ""
 
