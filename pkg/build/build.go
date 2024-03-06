@@ -22,6 +22,8 @@ const (
 	LocalNameDockerfile   = "dockerfile"
 	keyFilename           = "filename"
 	defaultDockerfileName = "aikitfile.yaml"
+	target                = "target"
+	output                = "output"
 )
 
 func Build(ctx context.Context, c client.Client) (*client.Result, error) {
@@ -164,19 +166,24 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Inference
 		return nil, nil, errors.Wrap(err, "getting config")
 	}
 	if finetuneCfg != nil {
-		target, ok := opts["target"]
+		target, ok := opts[target]
 		if !ok {
-			target = "unsloth"
+			target = utils.TargetUnsloth
 		}
 		finetuneCfg.Target = target
+
+		_, ok = opts[output]
+		if !ok {
+			return nil, nil, errors.New("--output is required for finetune. please specify a directory to save the finetuned model")
+		}
 	}
 
 	return inferenceCfg, finetuneCfg, nil
 }
 
-var supportedFineTuneTargets = []string{"unsloth"}
-
 func validateFinetuneConfig(c *config.FineTuneConfig) error {
+	supportedFineTuneTargets := []string{utils.TargetUnsloth}
+
 	if c.APIVersion == "" {
 		return errors.New("apiVersion is not defined")
 	}

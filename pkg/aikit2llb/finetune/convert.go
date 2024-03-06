@@ -55,7 +55,7 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 	state = state.Run(utils.Sh("apt-get update && apt-get install -y --no-install-recommends cuda-toolkit cuda-nvcc-12-3 && apt-get clean")).Root()
 
 	var scratch llb.State
-	if c.Target == "unsloth" {
+	if c.Target == utils.TargetUnsloth {
 		// installing unsloth and its dependencies
 		state = state.Run(utils.Sh("pip install --upgrade pip --break-system-packages && pip install packaging torch==2.1.0 ipython --break-system-packages")).Root()
 		state = state.Run(utils.Shf("pip install 'unsloth[cu121_ampere] @ git+https://github.com/unslothai/unsloth.git@%[1]s' --break-system-packages", unslothCommitSHA)).Root()

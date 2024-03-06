@@ -13,14 +13,14 @@ pei docker buildx create --name aikit-builder --use --buildkitd-flags '--allow-i
 
 echo "Create a configuration for the fine tuning. We are going to be using a LLama 2 model and fine tune using yahma/alpaca-cleaned dataset."
 
-pei cat <<EOF >> aikit-finetune.yaml
+pei "cat <<EOF >> aikit-finetune.yaml
 #syntax=sozercan/aikit:latest
 apiVersion: v1alpha1
 baseModel: unsloth/llama-2-7b-bnb-4bit
 datasets:
   - source: "yahma/alpaca-cleaned"
     type: alpaca
-EOF
+EOF"
 
 echo "Starting the process using the above configuration file, and output fine tuned model will be saved in _output folder."
 
@@ -34,13 +34,13 @@ echo "Now that we have a fine tuned model. We can deploy it as a minimal contain
 
 echo "We'll start by creating a basic inference configuration file for the deployment."
 
-pei cat <<EOF >> aikit-inference.yaml
+pei "cat <<EOF >> aikit-inference.yaml
 #syntax=sozercan/aikit:latest
 apiVersion: v1alpha1
 models:
   - name: llama-2-finetuned
     source: aikit-model-q4_k_m.gguf
-EOF
+EOF"
 
 echo "We can now build a minimal container for the model using the configuration file."
 
