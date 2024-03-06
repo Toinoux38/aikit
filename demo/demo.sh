@@ -5,101 +5,102 @@
 clear
 DEMO_PROMPT="${GREEN}➜  ${COLOR_RESET}"
 
-# echo "✨ In this demo, we are going to start by fine tuning a model and then deploy the model as a minimal container!"
+echo "✨ In this demo, we are going to start by fine tuning a model and then deploy the model as a minimal container!"
 
-# echo ""
+echo ""
 
-# echo "👷‍♀️ First, we are going to create a new builder"
+echo "👷‍♀️ First, we are going to create a new builder"
 
-# echo ""
+echo ""
 
-# pei "docker buildx create --name aikit-builder --use --buildkitd-flags '--allow-insecure-entitlement security.insecure'"
+pei "docker buildx create --name aikit-builder --use --buildkitd-flags '--allow-insecure-entitlement security.insecure'"
 
-# echo ""
+echo ""
 
-# echo "🗃️ Create a configuration for the fine tuning. We are going to be using a LLama 2 model and fine tune using yahma/alpaca-cleaned dataset."
+echo "🗃️ Create a configuration for the fine tuning. We are going to be using a LLama 2 model and fine tune using yahma/alpaca-cleaned dataset."
 
-# cat > aikit-finetune.yaml << EOF
-# #syntax=sozercan/aikit:latest
-# apiVersion: v1alpha1
-# baseModel: unsloth/llama-2-7b-bnb-4bit
-# datasets:
-#   - source: "yahma/alpaca-cleaned"
-#     type: alpaca
-# config:
-#   unsloth:
-# EOF
+cat > aikit-finetune.yaml << EOF
+#syntax=sozercan/aikit:latest
+apiVersion: v1alpha1
+baseModel: unsloth/llama-2-7b-bnb-4bit
+datasets:
+  - source: "yahma/alpaca-cleaned"
+    type: alpaca
+config:
+  unsloth:
+EOF
 
-# echo ""
+echo ""
 
-# pei "bat aikit-finetune.yaml"
+pei "bat aikit-finetune.yaml"
 
-# echo ""
+echo ""
 
-# echo "🎵 Starting the fine tuning process using the above configuration file, and output fine tuned model will be saved in _output folder."
+echo "🎵 Starting the fine tuning process using the above configuration file, and output fine tuned model will be saved in _output folder."
 
-# echo ""
+echo ""
 
-# pei "docker buildx build --builder aikit-builder --allow security.insecure --file 'aikit-finetune.yaml' --output '_output' --target unsloth --progress plain ."
+pei "docker buildx build --builder aikit-builder --allow security.insecure --file 'aikit-finetune.yaml' --output '_output' --target unsloth --progress plain ."
 
-# echo ""
+echo ""
 
-# echo "✅ We have finished fine tuning the model. Let's look at the output..."
+echo "✅ We have finished fine tuning the model. Let's look at the output..."
 
-# echo ""
+echo ""
 
-# pei "ls -al _output"
+pei "ls -al _output"
 
-# echo ""
+echo ""
 
-# echo "📦 Now that we have a fine tuned model. We can deploy it as a minimal container."
+echo "📦 Now that we have a fine tuned model. We can deploy it as a minimal container."
 
-# echo ""
+echo ""
 
-# echo "📃 We'll start by creating a basic inference configuration file for the deployment."
+echo "📃 We'll start by creating a basic inference configuration file for the deployment."
 
-# cat <<EOF >> aikit-inference.yaml
-# #syntax=sozercan/aikit:latest
-# apiVersion: v1alpha1
-# models:
-#   - name: llama-2-finetuned
-#     source: aikit-model-q4_k_m.gguf
-# EOF
+cat <<EOF >> aikit-inference.yaml
+#syntax=sozercan/aikit:latest
+apiVersion: v1alpha1
+runtime: cuda
+models:
+  - name: llama-2-finetuned
+    source: aikit-model-q4_k_m.gguf
+EOF
 
-# pei "bat aikit-inference.yaml"
+pei "bat aikit-inference.yaml"
 
-# echo ""
+echo ""
 
-# echo "🏗️ We can now build a minimal container for the model using the configuration file."
+echo "🏗️ We can now build a minimal container for the model using the configuration file."
 
-# echo ""
+echo ""
 
-# pei "docker buildx build -t llama-finetuned -f aikit-inference.yaml --load _output"
+pei "docker buildx build -t llama-finetuned -f aikit-inference.yaml --load _output"
 
-# echo ""
+echo ""
 
-# echo "🏃 We have finished building the minimal container. Let's start the container and test it."
+echo "🏃 We have finished building the minimal container. Let's start the container and test it."
 
-# pei "docker run --name llama-2-finetuned -d --rm -p 8080:8080 llama-finetuned"
+pei "docker run --name llama-2-finetuned -d --rm -p 8080:8080 llama-finetuned"
 
-# echo ""
+echo ""
 
-# echo "🧪 We can now test the container using a sample query. Since this is OpenAI API compatible, you can use it as a drop-in replacement for any application that uses OpenAI API."
+echo "🧪 We can now test the container using a sample query. Since this is OpenAI API compatible, you can use it as a drop-in replacement for any application that uses OpenAI API."
 
-# echo ""
+echo ""
 
-pei "curl http://localhost:8080/v1/chat/completions -H \"Content-Type: application/json\" -d '{\"model\": \"llama-2-finetuned\", \"messages\": [{\"role\": \"user\", \"content\": \"Compose a haiku about cats\"}]}'"
+pei "curl http://localhost:8080/v1/chat/completions -H \"Content-Type: application/json\" -d '{\"model\": \"aikit-model-q4_k_m.gguf\", \"messages\": [{\"role\": \"user\", \"content\": \"Compose a haiku about cats\"}]}'"
 
-# echo ""
+echo ""
 
-# echo "🙌 We have successfully deployed the fine tuned model as a minimal container and successfully verified it! We can now stop the container if we wish."
+echo "🙌 We have successfully deployed the fine tuned model as a minimal container and successfully verified it! We can now stop the container if we wish."
 
-# echo ""
+echo ""
 
-# pei "docker stop llama-2-finetuned"
+pei "docker stop llama-2-finetuned"
 
-# echo ""
+echo ""
 
-# echo "❤️ In this demo, we have shown how to fine tune a model and deploy it as a minimal container using AIKit. Thank you for watching!"
+echo "❤️ In this demo, we have shown how to fine tune a model and deploy it as a minimal container using AIKit. Thank you for watching!"
 
-# pei "docker buildx rm aikit-builder"
+pei "docker buildx rm aikit-builder"
