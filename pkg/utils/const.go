@@ -18,4 +18,5 @@ const (
 	APIv1alpha1 = "v1alpha1"
 
 	DebianSlim = "docker.io/library/debian:12-slim"
+	PythonBase = "docker.io/library/python:3.11"
 )
