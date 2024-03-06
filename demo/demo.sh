@@ -5,15 +5,15 @@
 clear
 DEMO_PROMPT="${GREEN}➜  ${COLOR_RESET}"
 
-echo "In this demo, we are going to start by fine tuning a model and then deploy the model as a minimal container!"
+echo "✨ In this demo, we are going to start by fine tuning a model and then deploy the model as a minimal container!"
 
-echo "First, we are going to create a new builder"
+echo "\n👷‍♂️ First, we are going to create a new builder"
 
-pei "docker buildx create --name aikit-builder --use --buildkitd-flags '--allow-insecure-entitlement security.insecure'"
+# pei "docker buildx create --name aikit-builder --use --buildkitd-flags '--allow-insecure-entitlement security.insecure'"
 
-echo "Create a configuration for the fine tuning. We are going to be using a LLama 2 model and fine tune using yahma/alpaca-cleaned dataset."
+echo "\n🗃️ Create a configuration for the fine tuning. We are going to be using a LLama 2 model and fine tune using yahma/alpaca-cleaned dataset."
 
-pei cat <<EOF >> aikit-finetune.yaml
+pei "cat <<EOF >> aikit-finetune.yaml
 #syntax=sozercan/aikit:latest
 apiVersion: v1alpha1
 baseModel: unsloth/llama-2-7b-bnb-4bit
@@ -21,6 +21,7 @@ datasets:
   - source: "yahma/alpaca-cleaned"
     type: alpaca
 EOF
+"
 
 # echo "Starting the process using the above configuration file, and output fine tuned model will be saved in _output folder."
 
