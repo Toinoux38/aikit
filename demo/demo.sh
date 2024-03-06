@@ -58,7 +58,7 @@ echo ""
 
 echo "📃 We'll start by creating a basic inference configuration file for the deployment."
 
-cat <<EOF >> aikit-inference.yaml
+cat > aikit-inference.yaml << EOF
 #syntax=sozercan/aikit:latest
 apiVersion: v1alpha1
 runtime: cuda
@@ -80,6 +80,8 @@ pei "docker buildx build -t llama-finetuned -f aikit-inference.yaml --load _outp
 echo ""
 
 echo "🏃 We have finished building the minimal container. Let's start the container and test it."
+
+echo ""
 
 pei "docker run --name llama-2-finetuned -d --rm -p 8080:8080 llama-finetuned"
 

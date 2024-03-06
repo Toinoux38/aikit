@@ -5,7 +5,6 @@ import (
 
 	"github.com/moby/buildkit/client/llb"
 	"github.com/moby/buildkit/util/system"
-	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/sozercan/aikit/pkg/aikit/config"
 	"github.com/sozercan/aikit/pkg/utils"
 	"gopkg.in/yaml.v2"
@@ -17,9 +16,7 @@ const (
 	nvidiaMknod      = "mknod --mode 666 /dev/nvidiactl c 195 255 && mknod --mode 666 /dev/nvidia-uvm c 235 0 && mknod --mode 666 /dev/nvidia-uvm-tools c 235 1 && mknod --mode 666 /dev/nvidia0 c 195 0 && nvidia-smi"
 )
 
-func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
-	imageCfg := NewImageConfig()
-
+func Aikit2LLB(c *config.FineTuneConfig) llb.State {
 	env := map[string]string{
 		"PATH":                       system.DefaultPathEnv("linux") + ":/usr/local/cuda/bin",
 		"NVIDIA_REQUIRE_CUDA":        "cuda>=12.0",
@@ -28,7 +25,7 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 		"LD_LIBRARY_PATH":            "/usr/local/cuda/lib64",
 	}
 
-	state := llb.Image(utils.DebianSlim)
+	state := llb.Image(utils.PythonBase)
 	for k, v := range env {
 		state = state.AddEnv(k, v)
 	}
@@ -84,5 +81,5 @@ func Aikit2LLB(c *config.FineTuneConfig) (llb.State, *specs.Image) {
 		scratch = llb.Scratch().File(llb.Copy(state, inputFile, outputFile, copyOpts...))
 	}
 
-	return scratch, imageCfg
+	return scratch
 }
