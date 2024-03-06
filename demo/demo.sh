@@ -11,6 +11,8 @@ echo ""
 
 echo "👷‍♀️ First, we are going to create a new builder"
 
+echo ""
+
 pei "docker buildx create --name aikit-builder --use --buildkitd-flags '--allow-insecure-entitlement security.insecure'"
 
 echo ""
@@ -26,11 +28,13 @@ datasets:
     type: alpaca
 EOF
 
+echo ""
+
 pei "bat aikit-finetune.yaml"
 
 echo ""
 
-echo "🎵 Starting the process using the above configuration file, and output fine tuned model will be saved in _output folder."
+echo "🎵 Starting the fine tuning process using the above configuration file, and output fine tuned model will be saved in _output folder."
 
 echo ""
 
