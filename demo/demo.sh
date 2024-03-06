@@ -88,7 +88,7 @@ DEMO_PROMPT="${GREEN}➜  ${COLOR_RESET}"
 
 # echo ""
 
-pei "curl http://localhost:8080/v1/chat/completions -H \"Content-Type: application/json\" -d \"{'model': 'llama-2-finetuned', 'messages': [{'role': 'user', 'content': 'Compose a haiku about cats'}]}"
+pei "curl http://localhost:8080/v1/chat/completions -H \"Content-Type: application/json\" -d '{\"model\": \"llama-2-finetuned\", \"messages\": [{\"role\": \"user\", \"content\": \"Compose a haiku about cats\"}]}'"
 
 # echo ""
 
