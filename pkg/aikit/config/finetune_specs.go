@@ -2,42 +2,39 @@ package config
 
 type FineTuneConfig struct {
 	APIVersion string             `yaml:"apiVersion"`
-	Target     string             `yaml:"target,omitempty"`
-	BaseModel  string             `yaml:"baseModel,omitempty"`
+	Target     string             `yaml:"target"`
+	BaseModel  string             `yaml:"baseModel"`
 	Datasets   []Dataset          `yaml:"datasets"`
-	Config     FineTuneConfigSpec `yaml:"config,omitempty"`
-	Output     FineTuneOutputSpec `yaml:"output,omitempty"`
+	Config     FineTuneConfigSpec `yaml:"config"`
+	Output     FineTuneOutputSpec `yaml:"output"`
 }
 
 type FineTuneConfigSpec struct {
-	Axolotl FineTuneConfigAxolotlSpec `yaml:"axolotl,omitempty"`
-	Unsloth FineTuneConfigUnslothSpec `yaml:"unsloth,omitempty"`
+	Unsloth FineTuneConfigUnslothSpec `yaml:"unsloth"`
 }
 
 type Dataset struct {
-	Source string `yaml:"source,omitempty"`
-	Type   string `yaml:"type,omitempty"`
+	Source string `yaml:"source"`
+	Type   string `yaml:"type"`
 }
-
-type FineTuneConfigAxolotlSpec struct{}
 
 type FineTuneConfigUnslothSpec struct {
 	Packing                   bool    `yaml:"packing"`
-	MaxSeqLength              int     `yaml:"maxSeqLength,omitempty"`
-	LoadIn4bit                bool    `yaml:"loadIn4bit,omitempty"`
-	BatchSize                 int     `yaml:"batchSize,omitempty"`
-	GradientAccumulationSteps int     `yaml:"gradientAccumulationSteps,omitempty"`
-	WarmupSteps               int     `yaml:"warmupSteps,omitempty"`
-	MaxSteps                  int     `yaml:"maxSteps,omitempty"`
-	LearningRate              float64 `yaml:"learningRate,omitempty"`
-	LoggingSteps              int     `yaml:"loggingSteps,omitempty"`
-	Optimizer                 string  `yaml:"optimizer,omitempty"`
-	WeightDecay               float64 `yaml:"weightDecay,omitempty"`
-	LrSchedulerType           string  `yaml:"lrSchedulerType,omitempty"`
-	Seed                      int     `yaml:"seed,omitempty"`
+	MaxSeqLength              int     `yaml:"maxSeqLength"`
+	LoadIn4bit                bool    `yaml:"loadIn4bit"`
+	BatchSize                 int     `yaml:"batchSize"`
+	GradientAccumulationSteps int     `yaml:"gradientAccumulationSteps"`
+	WarmupSteps               int     `yaml:"warmupSteps"`
+	MaxSteps                  int     `yaml:"maxSteps"`
+	LearningRate              float64 `yaml:"learningRate"`
+	LoggingSteps              int     `yaml:"loggingSteps"`
+	Optimizer                 string  `yaml:"optimizer"`
+	WeightDecay               float64 `yaml:"weightDecay"`
+	LrSchedulerType           string  `yaml:"lrSchedulerType"`
+	Seed                      int     `yaml:"seed"`
 }
 
 type FineTuneOutputSpec struct {
-	Quantize string `yaml:"quantize,omitempty"`
-	Name     string `yaml:"name,omitempty"`
+	Quantize string `yaml:"quantize"`
+	Name     string `yaml:"name"`
 }

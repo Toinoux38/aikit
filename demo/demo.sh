@@ -26,6 +26,8 @@ baseModel: unsloth/llama-2-7b-bnb-4bit
 datasets:
   - source: "yahma/alpaca-cleaned"
     type: alpaca
+config:
+  unsloth:
 EOF
 
 echo ""
@@ -90,7 +92,7 @@ pei "curl http://localhost:8080/v1/chat/completions -H 'Content-Type: applicatio
 
 echo ""
 
-echo "👏 We have successfully deployed the fine tuned model as a minimal container and tested it. We can now stop the container."
+echo "🙌 We have successfully deployed the fine tuned model as a minimal container and tested it. We can now stop the container."
 
 echo ""
 
@@ -98,4 +100,4 @@ pei "docker stop llama-2-finetuned"
 
 echo ""
 
-echo "🙌 In this demo, we have shown how to fine tune a model and deploy it as a minimal container using AIKit. Thank you for watching!"
+echo "❤️ In this demo, we have shown how to fine tune a model and deploy it as a minimal container using AIKit. Thank you for watching!"

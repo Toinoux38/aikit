@@ -172,8 +172,7 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Inference
 		}
 		finetuneCfg.Target = target
 
-		_, ok = opts[output]
-		if !ok {
+		if opts[output] != "" {
 			return nil, nil, errors.New("--output is required for finetune. please specify a directory to save the finetuned model")
 		}
 	}
