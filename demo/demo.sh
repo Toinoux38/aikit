@@ -9,9 +9,10 @@ echo "✨ In this demo, we are going to start by fine tuning a model and then de
 
 echo ""
 
-echo "👷‍♂️ First, we are going to create a new builder"
+echo "👷‍♀️ First, we are going to create a new builder"
 
-# pei "docker buildx create --name aikit-builder --use --buildkitd-flags '--allow-insecure-entitlement security.insecure'"
+pei "docker buildx create --name aikit-builder --use --buildkitd-flags '--allow-insecure-entitlement security.insecure'"
+
 echo ""
 
 echo "🗃️ Create a configuration for the fine tuning. We are going to be using a LLama 2 model and fine tune using yahma/alpaca-cleaned dataset."
@@ -27,40 +28,70 @@ EOF
 
 pei "bat aikit-finetune.yaml"
 
-# echo "Starting the process using the above configuration file, and output fine tuned model will be saved in _output folder."
+echo ""
 
-# pei "docker buildx build --builder aikit-builder --allow security.insecure --file 'aikit-finetune.yaml' --output '_output' --target unsloth --progress plain ."
+echo "🎵 Starting the process using the above configuration file, and output fine tuned model will be saved in _output folder."
 
-# echo "We have finished fine tuning the model. Let's look at the output."
+echo ""
 
-# pei "ls -al _output"
+pei "docker buildx build --builder aikit-builder --allow security.insecure --file 'aikit-finetune.yaml' --output '_output' --target unsloth --progress plain ."
 
-# echo "Now that we have a fine tuned model. We can deploy it as a minimal container."
+echo ""
 
-# echo "We'll start by creating a basic inference configuration file for the deployment."
+echo "✅ We have finished fine tuning the model. Let's look at the output..."
 
-# pei "cat <<EOF >> aikit-inference.yaml
-# #syntax=sozercan/aikit:latest
-# apiVersion: v1alpha1
-# models:
-#   - name: llama-2-finetuned
-#     source: aikit-model-q4_k_m.gguf
-# EOF"
+echo ""
 
-# echo "We can now build a minimal container for the model using the configuration file."
+pei "ls -al _output"
 
-# pei "docker buildx build -t llama-finetuned -f aikit-inference.yaml --load _output"
+echo ""
 
-# echo "We have finished building the minimal container. Let's start the container and test it."
+echo "📦 Now that we have a fine tuned model. We can deploy it as a minimal container."
 
-# pei "docker run --name llama-2-finetuned -d --rm -p 8080:8080 llama-finetuned"
+echo ""
 
-# echo "We can now test the container using a sample query"
+echo "📃 We'll start by creating a basic inference configuration file for the deployment."
 
-# pei "curl http://localhost:8080/v1/chat/completions -H 'Content-Type: application/json' -d '{'model': 'llama-2-finetuned', 'messages': [{'role': 'user', 'content': 'Compose a haiku about cats'}]}'"
+cat <<EOF >> aikit-inference.yaml
+#syntax=sozercan/aikit:latest
+apiVersion: v1alpha1
+models:
+  - name: llama-2-finetuned
+    source: aikit-model-q4_k_m.gguf
+EOF
 
-# echo "We have successfully deployed the fine tuned model as a minimal container and tested it. We can now stop the container."
+pei "bat aikit-inference.yaml"
 
-# pei "docker stop llama-2-finetuned"
+echo ""
 
-# echo "In this demo, we have shown how to fine tune a model and deploy it as a minimal container using AIKit. Thank you for watching!"
+echo "🏗️ We can now build a minimal container for the model using the configuration file."
+
+echo ""
+
+pei "docker buildx build -t llama-finetuned -f aikit-inference.yaml --load _output"
+
+echo ""
+
+echo "🏃 We have finished building the minimal container. Let's start the container and test it."
+
+pei "docker run --name llama-2-finetuned -d --rm -p 8080:8080 llama-finetuned"
+
+echo ""
+
+echo "🧪 We can now test the container using a sample query. Since this is OpenAI API compatible, you can use it as a drop-in replacement for any application that uses OpenAI API."
+
+echo ""
+
+pei "curl http://localhost:8080/v1/chat/completions -H 'Content-Type: application/json' -d '{'model': 'llama-2-finetuned', 'messages': [{'role': 'user', 'content': 'Compose a haiku about cats'}]}'"
+
+echo ""
+
+echo "👏 We have successfully deployed the fine tuned model as a minimal container and tested it. We can now stop the container."
+
+echo ""
+
+pei "docker stop llama-2-finetuned"
+
+echo ""
+
+echo "🙌 In this demo, we have shown how to fine tune a model and deploy it as a minimal container using AIKit. Thank you for watching!"
