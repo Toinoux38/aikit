@@ -16,14 +16,16 @@ echo ""
 
 echo "🗃️ Create a configuration for the fine tuning. We are going to be using a LLama 2 model and fine tune using yahma/alpaca-cleaned dataset."
 
-pe "cat > aikit-finetune.yaml << EOF
+cat > aikit-finetune.yaml << EOF
 #syntax=sozercan/aikit:latest
 apiVersion: v1alpha1
 baseModel: unsloth/llama-2-7b-bnb-4bit
 datasets:
   - source: "yahma/alpaca-cleaned"
     type: alpaca
-EOF"
+EOF
+
+pei "bat aikit-finetune.yaml"
 
 # echo "Starting the process using the above configuration file, and output fine tuned model will be saved in _output folder."
 
