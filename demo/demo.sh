@@ -65,6 +65,15 @@ runtime: cuda
 models:
   - name: llama-2-finetuned
     source: aikit-model-q4_k_m.gguf
+config: |
+  - name: llama-2-finetuned
+    parameters:
+      model: aikit-model-q4_k_m.gguf
+    context_size: 4096
+    gpu_layers: 35
+    f16: true
+    batch: 512
+    mmap: true
 EOF
 
 pei "bat aikit-inference.yaml"
