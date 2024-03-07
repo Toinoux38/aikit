@@ -60,6 +60,7 @@ echo "📃 We'll start by creating a basic inference configuration file for the 
 
 cat > aikit-inference.yaml << EOF
 #syntax=sozercan/aikit:latest
+debug: true
 apiVersion: v1alpha1
 runtime: cuda
 models:
@@ -114,4 +115,4 @@ echo ""
 
 echo "❤️ In this demo, we have shown how to fine tune a model and deploy it as a minimal container using AIKit. Thank you for watching!"
 
-pei "docker buildx rm aikit-builder"
+# pei "docker buildx rm aikit-builder"
