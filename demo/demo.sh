@@ -61,6 +61,7 @@ echo "📃 We'll start by creating a basic inference configuration file for the 
 cat > aikit-inference.yaml << EOF
 #syntax=sozercan/aikit:latest
 apiVersion: v1alpha1
+debug: true
 runtime: cuda
 models:
   - name: llama-2-finetuned
@@ -84,7 +85,7 @@ echo "🏗️ We can now build a minimal container for the model using the confi
 
 echo ""
 
-pei "docker buildx build -t llama-finetuned -f aikit-inference.yaml --load _output"
+pei "docker buildx build -t llama-finetuned -f aikit-inference.yaml --load --progress plain _output"
 
 echo ""
 
@@ -100,7 +101,7 @@ echo "🧪 We can now test the container using a sample query. Since this is Ope
 
 echo ""
 
-pei "curl http://localhost:8080/v1/chat/completions -H \"Content-Type: application/json\" -d '{\"model\": \"aikit-model-q4_k_m.gguf\", \"messages\": [{\"role\": \"user\", \"content\": \"Compose a haiku about cats\"}]}'"
+pei "curl http://localhost:8080/v1/chat/completions -H \"Content-Type: application/json\" -d '{\"model\": \"llama-2-finetuned\", \"messages\": [{\"role\": \"user\", \"content\": \"Compose a haiku about cats\"}]}'"
 
 echo ""
 
