@@ -1,8 +1,6 @@
 package inference
 
 import (
-	"strings"
-
 	"github.com/moby/buildkit/util/system"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/sozercan/aikit/pkg/aikit/config"
@@ -11,16 +9,16 @@ import (
 
 func NewImageConfig(c *config.InferenceConfig) *specs.Image {
 	img := emptyImage(c)
-	var debug, config string
+	cmd := []string{}
 	if c.Debug {
-		debug = "--debug"
+		cmd = append(cmd, "--debug")
 	}
 	if c.Config != "" {
-		config = "--config-file=/config.yaml"
+		cmd = append(cmd, "--config-file=/config.yaml")
 	}
 
-	params := strings.TrimSpace(debug + " " + config)
-	img.Config.Entrypoint = []string{"local-ai", params}
+	img.Config.Entrypoint = []string{"local-ai"}
+	img.Config.Cmd = cmd
 	return img
 }
 
