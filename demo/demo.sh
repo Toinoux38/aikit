@@ -40,7 +40,7 @@ echo "🎵 Starting the fine tuning process using the above configuration file, 
 
 echo ""
 
-pei "docker buildx build --builder aikit-builder --allow security.insecure --file 'aikit-finetune.yaml' --output '_output' --target unsloth --progress plain ."
+pei "docker buildx build --allow security.insecure --file 'aikit-finetune.yaml' --output '_output' --target unsloth --progress plain ."
 
 echo ""
 
@@ -61,7 +61,6 @@ echo "📃 We'll start by creating a basic inference configuration file for the 
 cat > aikit-inference.yaml << EOF
 #syntax=sozercan/aikit:latest
 apiVersion: v1alpha1
-debug: true
 runtime: cuda
 models:
   - name: llama-2-finetuned
