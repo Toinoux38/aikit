@@ -33,5 +33,5 @@ curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/jso
 ```
 
 :::tip
-For an example Kubernetes deployment and service YAML, see [kubernetes folder](./kubernetes/). Please note that these are examples, you may need to customize them (such as properly configured resource requests and limits) based on your needs.
+For an example Kubernetes deployment and service YAML, see [kubernetes folder](https://github.com/sozercan/aikit/tree/main/kubernetes). Please note that these are examples, you may need to customize them (such as properly configured resource requests and limits) based on your needs.
 :::
